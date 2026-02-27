@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  theme:
+    - puzz
+id: puzz_local_tasks
+theme: puzz
+region: content
+weight: -7
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: ''
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility: {  }

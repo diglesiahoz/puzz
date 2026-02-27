@@ -1,0 +1,75 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Input
+description: Accessible text input form control.
+group: Forms
+
+# Use libraryOverrides to attach the compiled CSS/JS for this component.
+# The puzz/input library is registered automatically in hook_library_info_alter()
+# and points to build/components/input/input.css and input.js.
+libraryOverrides:
+  dependencies:
+    - puzz/input
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Field name
+      description: Input name attribute.
+      examples:
+        - email
+        - search
+    id:
+      type: string
+      title: Field id
+      description: Input id attribute. Auto-generated from name if omitted.
+      examples:
+        - edit-email
+    type:
+      type: string
+      title: Input type
+      description: HTML input type attribute.
+      enum:
+        - text
+        - email
+        - password
+        - number
+        - search
+        - tel
+        - url
+      default: text
+    label:
+      type: string
+      title: Label
+      description: Visible label for the input.
+      examples:
+        - Email
+        - Search
+    value:
+      type: string
+      title: Value
+      description: Current value of the input.
+    placeholder:
+      type: string
+      title: Placeholder
+      description: Placeholder text displayed when empty.
+    required:
+      type: boolean
+      title: Required
+      description: Whether the field is required.
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: Whether the field is disabled.
+      default: false
+    error:
+      type: string
+      title: Error message
+      description: Validation error message to display below the field.
+    help:
+      type: string
+      title: Help text
+      description: Optional helper text displayed below the field.
+

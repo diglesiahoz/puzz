@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Breadcrumb component template.
+ */
+#}
+
+{% if show_breadcrumb and breadcrumb_region %}
+<div id="breadcrumb">
+  <div class="container">
+    {{ breadcrumb_region }}
+  </div>
+</div>
+{% endif %}

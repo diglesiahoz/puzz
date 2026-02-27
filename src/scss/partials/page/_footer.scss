@@ -1,0 +1,272 @@
+/**
+ * @file
+ * Footer styles.
+ * Mobile-first approach: base styles are for mobile, desktop styles use min-width media queries.
+ */
+
+@use '../env' as *;
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+// ============================================================================
+// MOBILE STYLES (Base - xs)
+// ============================================================================
+
+footer {
+  background-color: var(--color-5);
+  border-top: 1px solid #dee2e6;
+  padding: $spacing-xl 0;
+  margin-top: $spacing-xxl;
+}
+
+#footer {
+  padding: 2.5rem 0 0 0;
+  color: #ffffff;
+  background: linear-gradient(0deg, var(--color-4), var(--color-3));
+
+  .block {
+    & > h2 {
+      display: none;
+    }
+
+    .field {
+      margin: 0;
+
+      p {
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      a {
+        color: #fff;
+
+        &:hover {
+          color: var(--color-1);
+        }
+      }
+    }
+  }
+
+  // Footer branding
+  .block-system-branding-block {
+    margin-bottom: 2.5rem;
+
+    a.logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+
+      .image {
+        display: block;
+        padding-right: 0.8125rem;
+
+        img {
+          width: auto;
+          height: 4.5rem;
+        }
+      }
+
+      .title {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .site-name {
+          display: block;
+          color: #ffffff;
+          font-family: 'Geologica', sans-serif;
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+
+        .site-slogan {
+          position: relative;
+          top: -0.3125rem;
+          display: block;
+          color: #ffffff;
+          font-family: 'Geologica', sans-serif;
+          font-size: 0.9375rem;
+          font-weight: 100;
+        }
+      }
+    }
+  }
+
+  // Footer menu
+  .block-menu {
+    padding-bottom: 2.5rem;
+
+    ul.menu {
+      li {
+        a {
+          display: block;
+          padding: 0.5rem 0;
+          text-decoration: underline;
+          color: #ffffff;
+          font-size: 1.125rem;
+
+          &:hover {
+            color: color-mix(in srgb, var(--color-5) 75%, transparent);
+          }
+        }
+      }
+    }
+  }
+}
+
+#copyright {
+  text-align: center;
+  color: #ffffff;
+  background: var(--color-4);
+  padding: 0 0 3.75rem 0;
+
+  .block {
+    margin: 0 0 1.25rem 0;
+    color: #ffffff;
+    font-size: 0.875rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    & > h2 {
+      display: none;
+    }
+
+    p,
+    span {
+      display: inline-block;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    p a,
+    span a {
+      color: var(--color-1);
+
+      &:hover {
+        color: #ddd;
+      }
+    }
+  }
+
+  .block-menu {
+    ul.menu {
+      li {
+        margin: 0;
+        line-height: 1.5;
+
+        a {
+          display: block;
+          padding: 0.3125rem 0;
+          text-align: center;
+          text-decoration: none;
+          color: #ddd;
+          font-size: 0.875rem;
+
+          &:hover {
+            color: var(--color-1);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// BREAKPOINT: SM (Small devices)
+// ============================================================================
+@include mq('sm') {
+  #footer {
+    .container {
+      padding: 0 2.5rem;
+    }
+
+    .region-footer {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+
+      .block-system-branding-block {
+        grid-column: 1 / span 2;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// BREAKPOINT: MD (Medium devices - Desktop)
+// ============================================================================
+@include mq('md') {
+  #footer {
+    .container {
+      padding: 0 3.125rem;
+    }
+
+    .region-footer {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .block-menu {
+      margin-bottom: 0;
+
+      ul.menu li a {
+        padding: 0.5625rem 0 0.5625rem 0;
+        text-decoration: none;
+        font-size: inherit;
+      }
+    }
+  }
+
+  #copyright {
+    padding: 1.875rem 0 3.75rem 0;
+
+    .region {
+      display: flex;
+      justify-content: center;
+      padding-top: 1.875rem;
+
+      .block {
+        margin-right: 1.875rem;
+        padding-right: 1.875rem;
+        border-right: 0.0625rem solid #ddd;
+
+        &:last-child {
+          margin-right: 0;
+          padding-right: 0;
+          border: 0;
+        }
+      }
+    }
+
+    .block-menu {
+      ul.menu {
+        display: flex;
+        flex-wrap: wrap;
+
+        li {
+          margin-right: 1.5625rem;
+
+          &:last-child {
+            margin-right: 0;
+          }
+
+          a {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// BREAKPOINT: LG (Large devices)
+// ============================================================================
+@include mq('lg') {
+  #footer {
+    .container {
+      padding: 0;
+    }
+  }
+}

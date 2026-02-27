@@ -1,0 +1,153 @@
+{#
+/**
+ * @file
+ * Theme override to display a single Drupal page.
+ * Uses SDC components for hero, breadcrumb, and banner.
+ * Header, main, and footer are rendered directly without SDC components.
+ */
+#}
+
+{# Header (navbar, header and menu) - rendered directly without SDC component #}
+<div id="navbar-wrapper">
+  <div id="navbar" role="banner">
+    {{ page.navbar }}
+    <button class="icon-menu">
+      <span class="icon-menu-1"></span>
+      <span class="icon-menu-2"></span>
+      <span class="icon-menu-3"></span>
+    </button>
+  </div>
+</div>
+
+<div id="navbar-collapse">
+
+  <header id="header" role="banner">
+    <div class="container">
+      <div id="header-wrapper">
+        {{ page.header }}
+        {{ page.header_menu }}
+        {{ page.header_search }}
+      </div>
+    </div>
+  </header>
+
+  {% if page.menu %}
+  <div id="menu" class="main-navigation">
+    <div class="container">
+      {{ page.menu }}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+{# Hero component #}
+{{ {
+  '#type': 'component',
+  '#component': 'puzz:hero',
+  '#props': {
+    'hero_region': page.hero|default(''),
+  }
+} }}
+
+{# Breadcrumb component #}
+{{ {
+  '#type': 'component',
+  '#component': 'puzz:breadcrumb',
+  '#props': {
+    'breadcrumb_region': page.breadcrumb|default(''),
+    'show_breadcrumb': not is_canvas_page and not is_front,
+  }
+} }}
+
+{# Main content (includes content, title and sidebars) - rendered directly without SDC component #}
+{%
+  set content_classes = [
+    page.sidebar_first and page.sidebar_second ? 'two-sidebars',
+    page.sidebar_first and not page.sidebar_second ? 'one-sidebar sidebar-first',
+    page.sidebar_second and not page.sidebar_first ? 'one-sidebar sidebar-second',
+    not page.sidebar_first and not page.sidebar_second ? 'no-sidebars'
+  ]
+%}
+
+<div id="center" class="{{ content_classes|join(' ') }}">
+  <div class="container">
+    <div class="region region-center">
+      {% if page.sidebar_first %}
+        <aside id="sidebar-first" class="sidebar" role="complementary">
+          {{ page.sidebar_first }}
+        </aside>
+      {% endif %}
+
+      <main id="main" role="main">
+        <a id="main-content" tabindex="-1"></a>
+        {% if not is_canvas_page and not is_front and page.title %}
+          {{ page.title }}
+        {% endif %}
+        {{ page.content }}
+
+        {#
+        
+        <h3>Components Examples</h3>
+
+        {{ {
+          '#type': 'component',
+          '#component': 'puzz:cta',
+          '#props': {
+            'text': 'Primary CTA',
+            'url': '#',
+            'variant': 'primary',
+            'size': 'medium'
+          }
+        } }}
+
+        {{ {
+          '#type': 'component',
+          '#component': 'puzz:input',
+          '#props': {
+            'name': 'email',
+            'label': 'Email',
+            'type': 'email',
+            'placeholder': 'tu@ejemplo.com',
+            'required': true,
+          }
+        } }}
+
+        #}
+
+      </main>
+
+      {% if page.sidebar_second %}
+        <aside id="sidebar-second" class="sidebar" role="complementary">
+          {{ page.sidebar_second }}
+        </aside>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# Banner component #}
+{{ {
+  '#type': 'component',
+  '#component': 'puzz:banner',
+  '#props': {
+    'banner_region': page.banners|default(''),
+  }
+} }}
+
+{# Footer - rendered directly without SDC component #}
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    {% if page.footer %}
+      <div class="region-footer">{{ page.footer }}</div>
+    {% endif %}
+  </div>
+</footer>
+
+{% if page.copyright %}
+<div id="copyright" role="contentinfo">
+  <div class="container">
+    <div class="region">{{ page.copyright }}</div>
+  </div>
+</div>
+{% endif %}

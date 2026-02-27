@@ -1,0 +1,50 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: CTA
+description: A call-to-action button component.
+group: Base
+# Usar libraryOverrides para especificar nuestra librería personalizada
+# La librería puzz/cta se registra automáticamente en hook_library_info_alter()
+# y apunta a build/components/cta/cta.css y cta.js
+libraryOverrides:
+  dependencies:
+    - puzz/cta
+props:
+  type: object
+  properties:
+    text:
+      type: string
+      title: Button text
+      description: The text displayed on the button
+      examples:
+        - 'Click here'
+        - 'Learn more'
+    url:
+      type: string
+      title: Link URL
+      description: The URL the button links to
+      format: uri
+      examples:
+        - 'https://example.com'
+        - '/node/1'
+    variant:
+      type: string
+      title: Button variant
+      description: Select button style variant
+      enum:
+        - primary
+        - secondary
+        - outline
+      default: primary
+      examples:
+        - primary
+    size:
+      type: string
+      title: Button size
+      description: Select button size
+      enum:
+        - small
+        - medium
+        - large
+      default: medium
+      examples:
+        - medium

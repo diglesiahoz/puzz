@@ -1,0 +1,8 @@
+# Archivos que no deben publicarse en npm (si se publica como paquete)
+node_modules/
+build/
+.git/
+.gitignore
+.env
+.env.example
+*.log

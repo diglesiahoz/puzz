@@ -1,0 +1,19 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Breadcrumb
+description: Breadcrumb navigation component.
+group: Layout
+libraryOverrides:
+  dependencies:
+    - puzz/breadcrumb
+props:
+  type: object
+  properties:
+    breadcrumb_region:
+      type: string
+      title: Breadcrumb region content
+      description: Content from the breadcrumb region
+    show_breadcrumb:
+      type: boolean
+      title: Show breadcrumb
+      description: Whether to show the breadcrumb (not on front page or canvas pages)
+      default: true

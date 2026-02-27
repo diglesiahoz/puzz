@@ -1,0 +1,14 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Hero
+description: Hero section component.
+group: Layout
+libraryOverrides:
+  dependencies:
+    - puzz/hero
+props:
+  type: object
+  properties:
+    hero_region:
+      type: string
+      title: Hero region content
+      description: Content from the hero region

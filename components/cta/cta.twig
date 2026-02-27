@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * CTA button component template.
+ */
+#}
+
+{% set classes = [
+  'cta',
+  'cta--' ~ variant|default('primary'),
+  'cta--' ~ size|default('medium'),
+] %}
+
+{# Button type is customizable; defaults to "button" but can be "submit" #}
+{% set button_type = button_type|default('button') %}
+
+{% if url is not empty %}
+  <a href="{{ url }}" class="{{ classes|join(' ') }}">
+    <span class="cta__text">{{ text }}</span>
+  </a>
+{% else %}
+  <button type="{{ button_type }}" class="{{ classes|join(' ') }}">
+    <span class="cta__text">{{ text }}</span>
+  </button>
+{% endif %}

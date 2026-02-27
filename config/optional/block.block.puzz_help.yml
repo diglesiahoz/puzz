@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - puzz
+id: puzz_help
+theme: puzz
+region: content
+weight: -9
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: ''
+  label_display: '0'
+  provider: help
+visibility: {  }

@@ -1,0 +1,44 @@
+/**
+ * @file
+ * Banner component styles.
+ */
+
+// Import variables and mixins from theme
+@use '../../src/scss/partials/env' as *;
+@use '../../src/scss/partials/base/variables' as *;
+@use '../../src/scss/partials/base/mixins' as *;
+
+.view-banners {
+  .view-content {
+    display: flex;
+    align-items: center;
+    padding: 7.5rem 0;
+
+    .views-row {
+      margin: 0 !important;
+    }
+  }
+}
+
+.node--type-banner {
+  text-align: center;
+
+  .image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+
+    img {
+      width: auto;
+      max-width: 9.375rem;
+      height: auto;
+      max-height: 6.25rem;
+      filter: grayscale(1);
+
+      &:hover {
+        filter: grayscale(0);
+      }
+    }
+  }
+}

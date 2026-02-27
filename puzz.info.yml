@@ -1,0 +1,23 @@
+type: theme
+base theme: false
+name: 'Puzz'
+core_version_requirement: ^10.4 || ^11
+description: 'Puzz Drupal theme - Modern SDC-based theme'
+screenshot: 'puzz-logo.png'
+regions:
+  navbar: 'Navbar'
+  header: 'Header'
+  header_menu: 'Header menu'
+  header_search: 'Header search'
+  menu: 'Menu'
+  hero: 'Hero'
+  breadcrumb: 'Breadcrumb'
+  title: 'Title'
+  content: 'Content'
+  sidebar_first: 'Primary sidebar'
+  sidebar_second: 'Secondary sidebar'
+  banners: 'Banners'
+  footer: 'Footer'
+  copyright: 'Copyright'
+libraries:
+  - puzz/global-styling

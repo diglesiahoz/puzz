@@ -1,0 +1,69 @@
+{#
+/**
+ * @file
+ * Text input form component template.
+ */
+#}
+
+{%
+  set input_id = id is not empty
+    ? id
+    : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-input')
+%}
+
+{%
+  set wrapper_classes = [
+    'puzz-input',
+    error is not empty ? 'puzz-input--error' : '',
+    disabled ? 'puzz-input--disabled' : '',
+    required ? 'puzz-input--required' : '',
+  ]
+%}
+
+{%
+  set described_by_ids = []
+%}
+
+{# Help and error IDs for aria-describedby #}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([input_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([input_id ~ '--error']) %}
+{% endif %}
+
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="{{ wrapper_classes|filter(v => v is not empty)|join(' ') }}">
+  {% if label is not empty %}
+    <label class="puzz-input__label" for="{{ input_id }}">
+      {{ label }}{% if required %}<span class="puzz-input__required-indicator">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <input
+    id="{{ input_id }}"
+    class="puzz-input__field"
+    type="{{ type|default('text') }}"
+    {% if name is not empty %}name="{{ name }}"{% endif %}
+    {% if value is not empty %}value="{{ value }}"{% endif %}
+    {% if placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
+    {% if required %}required aria-required="true"{% endif %}
+    {% if disabled %}disabled aria-disabled="true"{% endif %}
+    {% if error is not empty %}aria-invalid="true"{% endif %}
+    {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+  />
+
+  {% if help is not empty %}
+    <p id="{{ input_id }}--help" class="puzz-input__help">
+      {{ help }}
+    </p>
+  {% endif %}
+
+  {% if error is not empty %}
+    <p id="{{ input_id }}--error" class="puzz-input__error">
+      {{ error }}
+    </p>
+  {% endif %}
+</div>
+

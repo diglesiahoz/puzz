@@ -1,0 +1,25 @@
+# Solo librerías globales del tema.
+# Los componentes SDC se detectan automáticamente desde build/components/
+# y se registran vía hook_library_info_alter() en puzz.theme.
+# Cada componente carga SOLO su CSS/JS cuando se renderiza.
+
+global-styling:
+  css:
+    base:
+      build/css/main.css: {}      # Estilos principales (incluye todos los partials: variables, reset, base, typography, layout, theme)
+  js:
+    build/js/main.js: {}          # JavaScript global del tema (copiado desde src/js/main.js)
+  dependencies:
+    - core/drupal
+    - core/once
+
+# Librería JavaScript para manejar resets en theme settings
+theme-settings:
+  css:
+    component:
+      build/css/admin.css: {}
+  js:
+    scripts/theme-settings.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

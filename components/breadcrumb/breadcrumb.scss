@@ -1,0 +1,39 @@
+/**
+ * @file
+ * Breadcrumb component styles.
+ */
+
+// Import variables and mixins from theme
+@use '../../src/scss/partials/env' as *;
+@use '../../src/scss/partials/base/variables' as *;
+@use '../../src/scss/partials/base/mixins' as *;
+
+#breadcrumb {
+  .breadcrumb {
+    padding-bottom: 0.5em;
+
+    ol {
+      margin: 0;
+      padding: 0;
+    }
+
+    [dir='rtl'] ol {
+      margin-right: 0;
+    }
+
+    li {
+      display: inline;
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+
+      &::before {
+        content: ' \BB ';
+      }
+
+      &:first-child::before {
+        content: none;
+      }
+    }
+  }
+}

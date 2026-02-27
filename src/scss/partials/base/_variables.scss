@@ -1,0 +1,58 @@
+/**
+ * @file
+ * SCSS Variables.
+ * 
+ * Note: $APPSETTING_DEV is injected by build.js via temporary _env.scss file.
+ * The build script creates _env.scss in tmpdir with the environment variable value.
+ * All SCSS files use @use 'env' as *; to import this variable.
+ * 
+ * Note: Breakpoints are generated from breakpoints.json via _breakpoints.scss.
+ * Use @use 'breakpoints' as *; to import breakpoint variables.
+ */
+
+// Typography
+$font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-family-heading: $font-family-base;
+$font-family-monospace: 'Courier New', Courier, monospace;
+
+$font-size-base: 1rem;
+$font-size-sm: 0.875rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-xxl: 1.5rem;
+
+//$line-height-base: 1.5;
+//$line-height-heading: 1.2;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Spacing
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 1rem;      // 16px
+$spacing-lg: 1.5rem;    // 24px
+$spacing-xl: 2rem;      // 32px
+$spacing-xxl: 3rem;     // 48px
+
+// Breakpoints are now imported from _breakpoints.scss (generated from breakpoints.json)
+// Use @use 'breakpoints' as *; to access $breakpoint-* variables and $breakpoints map
+
+// Container
+// $container-max-width: 1200px;
+// $container-padding: 1rem;
+
+// Borders
+// $border-radius-sm: 0.125rem;   // 2px
+// $border-radius-md: 0.25rem;    // 4px
+// $border-radius-lg: 0.5rem;     // 8px
+
+// $border-width: 1px;
+// $border-color: #dee2e6;
+
+
+// Transitions
+$transition-1: all 0.2s ease-in-out;
+

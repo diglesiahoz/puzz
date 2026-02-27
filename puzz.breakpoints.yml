@@ -1,0 +1,36 @@
+default.xs:
+  label: XS
+  mediaQuery: '(max-width: 575px)'
+  weight: 0
+  multipliers:
+    - 1x
+default.sm:
+  label: SM
+  mediaQuery: '(min-width: 576px)'
+  weight: 1
+  multipliers:
+    - 1x
+default.md:
+  label: MD
+  mediaQuery: '(min-width: 768px)'
+  weight: 2
+  multipliers:
+    - 1x
+default.lg:
+  label: LG
+  mediaQuery: '(min-width: 992px)'
+  weight: 3
+  multipliers:
+    - 1x
+default.xl:
+  label: XL
+  mediaQuery: '(min-width: 1200px)'
+  weight: 4
+  multipliers:
+    - 1x
+default.xxl:
+  label: XXL
+  mediaQuery: '(min-width: 1400px)'
+  weight: 5
+  multipliers:
+    - 1x

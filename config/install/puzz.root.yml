@@ -1,0 +1,9 @@
+# Default color values for Puzz theme.
+# These values are used as fallbacks when colors are not customized via theme settings UI.
+root:
+  colors:
+    color_1: '#0066cc'
+    color_2: '#009cde'
+    color_3: '#122a70'
+    color_4: '#000000'
+    color_5: '#f8f9fa'

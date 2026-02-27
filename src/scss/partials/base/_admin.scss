@@ -1,0 +1,57 @@
+/**
+ * @file
+ * Admin styles for theme settings form.
+ */
+
+// Colors grid container
+.puzz-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// Reset all container - spans full width on larger screens
+.puzz-reset-all-container {
+  @media (min-width: 768px) {
+    grid-column: 1 / -1; // Span all columns
+  }
+}
+
+// Color field container
+.color-field-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background-color: #f8f9fa;
+
+  .form-item {
+    margin: 0;
+  }
+
+  .form-item label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-item .description {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .form-checkbox {
+    margin-top: 0.5rem;
+  }
+}

@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Theme override for an 'input' #type form element.
+ *
+ * Available variables:
+ * - component: The SDC component id to render (defaults to puzz:input).
+ * - props:     Props array mapped in puzz_preprocess_input().
+ *
+ * @see puzz_preprocess_input()
+ */
+#}
+
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:input',
+    '#props': props
+  } }}
+{% else %}
+  <input{{ attributes }} />{{ children }}
+{% endif %}

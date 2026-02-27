@@ -1,0 +1,83 @@
+/**
+ * @file
+ * Typography styles.
+ */
+
+@use '../env' as *;
+@use '../base/variables' as *;
+
+// Headings
+/*
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-heading;
+  font-weight: $font-weight-semibold;
+  line-height: 1.2;
+  color: var(--color-1);
+  margin-top: 0;
+  margin-bottom: $spacing-md;
+}
+
+h1 {
+  font-size: $font-size-xxl * 1.5; // 2.25rem
+  font-weight: $font-weight-bold;
+}
+
+h2 {
+  font-size: $font-size-xxl * 1.25; // 1.875rem
+}
+
+h3 {
+  font-size: $font-size-xl; // 1.25rem
+}
+
+h4 {
+  font-size: $font-size-lg; // 1.125rem
+}
+
+h5 {
+  font-size: $font-size-base; // 1rem
+}
+
+h6 {
+  font-size: $font-size-sm; // 0.875rem
+}
+
+// Paragraphs
+p {
+  margin-bottom: $spacing-md;
+}
+
+// Text utilities
+.text-small {
+  font-size: $font-size-sm;
+}
+
+.text-large {
+  font-size: $font-size-lg;
+}
+
+.text-muted {
+  color: var(--color-2);
+}
+
+.text-light {
+  color: var(--color-3);
+}
+
+// Font weights
+.font-normal {
+  font-weight: $font-weight-normal;
+}
+
+.font-medium {
+  font-weight: $font-weight-medium;
+}
+
+.font-semibold {
+  font-weight: $font-weight-semibold;
+}
+
+.font-bold {
+  font-weight: $font-weight-bold;
+}
+*/

@@ -1,0 +1,573 @@
+<?php
+
+/**
+ * @file
+ * Theme functions for Puzz theme.
+ */
+
+// Load preprocess logic split into separate include files.
+require_once __DIR__ . '/includes/preprocess.input.inc';
+require_once __DIR__ . '/includes/preprocess.form_element.inc';
+
+/**
+ * Drupal translation function stub for IDE/linter support.
+ * 
+ * @param string $string
+ *   A string containing the English text to translate.
+ * @param array $args
+ *   An associative array of replacements to make after translation.
+ * 
+ * @return string
+ *   The translated string.
+ */
+if (!function_exists('t')) {
+  function t($string, array $args = []) {
+    return \Drupal::translation()->translate($string, $args);
+  }
+}
+
+/**
+ * Gets the absolute path of the theme (for file_exists / is_dir).
+ */
+function _puzz_theme_root(): string {
+  return \Drupal::root() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz');
+}
+
+/**
+ * Implements hook_library_info_alter().
+ *
+ * Automatically detects components in build/components/ and registers a library for each one.
+ * Components in subdirectories use dashes in the ID (e.g., molecules/cta → puzz/molecules-cta).
+ */
+function puzz_library_info_alter(array &$libraries, string $extension): void {
+  if ($extension !== 'puzz') {
+    return;
+  }
+
+  $theme_root = _puzz_theme_root();
+  $build_dir = $theme_root . '/build/components';
+
+  if (!is_dir($build_dir)) {
+    return;
+  }
+
+  /**
+   * Recursively scan for component directories.
+   */
+  $scan_components = function($dir, $base_path = '') use (&$scan_components, &$libraries, $theme_root) {
+    if (!is_dir($dir) || !is_readable($dir)) {
+      return;
+    }
+    
+    $entries = @scandir($dir);
+    if (!is_array($entries)) {
+      return;
+    }
+    
+    foreach ($entries as $entry) {
+      if ($entry === '.' || $entry === '..') {
+        continue;
+      }
+      
+      $entry_path = $dir . '/' . $entry;
+      if (!is_dir($entry_path)) {
+        continue;
+      }
+      
+      // Check if this directory contains a component (has .css or .js files matching directory name)
+      $component_name = $entry;
+      $css_file = $entry_path . '/' . $component_name . '.css';
+      $js_file = $entry_path . '/' . $component_name . '.js';
+      
+      // If it has component files, register it
+      if (file_exists($css_file) || file_exists($js_file)) {
+        // Library ID: use base_path with dashes (e.g., 'molecules-cta' for 'molecules/cta')
+        // This is used for library names (puzz/molecules-cta)
+        $library_id = $base_path ? $base_path . '-' . $component_name : $component_name;
+        $build_path = $base_path ? 'build/components/' . $base_path . '/' . $component_name : 'build/components/' . $component_name;
+        
+        // Initialize definition with required structure
+        $definition = [];
+        
+        // Always set dependencies as array
+        $definition['dependencies'] = ['core/drupal', 'core/once'];
+        
+        // Add CSS if file exists
+        if (file_exists($css_file)) {
+          $definition['css'] = [
+            'component' => [
+              $build_path . '/' . $component_name . '.css' => [],
+            ],
+          ];
+        }
+        
+        // Add JS if file exists
+        if (file_exists($js_file)) {
+          $definition['js'] = [
+            $build_path . '/' . $component_name . '.js' => [],
+          ];
+        }
+        
+        // Only register if we have at least CSS or JS
+        // Ensure all arrays are properly initialized
+        $has_css = isset($definition['css']) && 
+                   is_array($definition['css']) && 
+                   isset($definition['css']['component']) &&
+                   is_array($definition['css']['component']) &&
+                   !empty($definition['css']['component']);
+        
+        $has_js = isset($definition['js']) && 
+                  is_array($definition['js']) && 
+                  !empty($definition['js']);
+        
+        if ($has_css || $has_js) {
+          // Ensure dependencies is always an array
+          if (!isset($definition['dependencies']) || !is_array($definition['dependencies'])) {
+            $definition['dependencies'] = ['core/drupal', 'core/once'];
+          }
+          $libraries[$library_id] = $definition;
+        }
+      } else {
+        // Not a component directory, but might contain subdirectories with components
+        // Continue scanning recursively
+        $new_base = $base_path ? $base_path . '-' . $entry : $entry;
+        $scan_components($entry_path, $new_base);
+      }
+    }
+  };
+  
+  $scan_components($build_dir);
+}
+
+/**
+ * Implements hook_sdc_component_alter().
+ *
+ * Automatically adds libraryOverrides so each component loads its CSS/JS
+ * when rendered. The library is automatically registered in hook_library_info_alter().
+ */
+function puzz_sdc_component_alter(array &$component, string $component_id, string $provider): void {
+  if ($provider !== 'puzz') {
+    return;
+  }
+
+  $theme_root = _puzz_theme_root();
+  $css_path = $theme_root . '/build/components/' . $component_id . '/' . $component_id . '.css';
+  $js_path = $theme_root . '/build/components/' . $component_id . '/' . $component_id . '.js';
+
+  if ((file_exists($css_path) || file_exists($js_path)) && 
+      (!isset($component['libraryOverrides']) || empty($component['libraryOverrides']))) {
+    if (!isset($component['libraryOverrides'])) {
+      $component['libraryOverrides'] = [];
+    }
+    if (!isset($component['libraryOverrides']['dependencies'])) {
+      $component['libraryOverrides']['dependencies'] = [];
+    }
+    $library_name = 'puzz/' . $component_id;
+    if (!in_array($library_name, $component['libraryOverrides']['dependencies'])) {
+      $component['libraryOverrides']['dependencies'][] = $library_name;
+    }
+  }
+}
+
+/**
+ * Gets the default color values for the theme from YAML config.
+ *
+ * @return array
+ *   Associative array with default color values (color_1 to color_5).
+ */
+function puzz_get_color_defaults(): array {
+  $theme_root = _puzz_theme_root();
+  $config_file = $theme_root . '/config/install/puzz.root.yml';
+  
+  if (!file_exists($config_file)) {
+    throw new \RuntimeException('Color defaults config file not found: ' . $config_file);
+  }
+  
+  try {
+    // Use Drupal's YAML parser (Symfony YAML component)
+    $yaml_content = file_get_contents($config_file);
+    if ($yaml_content === false) {
+      throw new \RuntimeException('Could not read color defaults config file.');
+    }
+    
+    $config = \Symfony\Component\Yaml\Yaml::parse($yaml_content);
+    if (!isset($config['root']['colors']) || !is_array($config['root']['colors'])) {
+      throw new \RuntimeException('Invalid color defaults config structure.');
+    }
+    
+    return $config['root']['colors'];
+  } catch (\Exception $e) {
+    throw new \RuntimeException('Error parsing color defaults config: ' . $e->getMessage());
+  }
+}
+
+/**
+ * Gets the theme colors (only color_1 to color_5).
+ *
+ * @param string|null $theme_name
+ *   Theme machine name, or NULL to use the active theme.
+ *
+ * @return array
+ *   Associative array with theme colors (configured values or defaults).
+ */
+function puzz_get_colors(?string $theme_name = NULL): array {
+  $defaults = puzz_get_color_defaults();
+  $config_name = ($theme_name ?? \Drupal::theme()->getActiveTheme()->getName()) . '.settings';
+
+  $colors = [];
+  foreach ($defaults as $key => $default) {
+    $setting_value = \Drupal::configFactory()->get($config_name)->get($key) ?? $default;
+    $colors[$key] = !empty($setting_value) ? $setting_value : $default;
+  }
+
+  return $colors;
+}
+
+/**
+ * Implements hook_form_system_theme_settings_alter().
+ */
+function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state): void {
+  // Only add Puzz color settings when editing Puzz theme (not on other themes' pages).
+  $config_key = $form['config_key']['#value'] ?? '';
+  if ($config_key !== 'puzz.settings') {
+    return;
+  }
+
+  $defaults = puzz_get_color_defaults();
+  $colors = puzz_get_colors('puzz');
+
+  // Colors section
+  $form['styles'] = [
+    '#type' => 'vertical_tabs',
+    '#title' => t('Styles'),
+  ];
+
+  // Add JavaScript library to handle resets
+  $form['#attached']['library'][] = 'puzz/theme-settings';
+
+  $form['styles']['colors'] = [
+    '#type' => 'details',
+    '#title' => t('Colors'),
+    '#open' => FALSE,
+    '#description' => t(''),
+    '#group' => 'styles',
+  ];
+
+  // Grid container for colors
+  $form['styles']['colors']['colors_grid'] = [
+    '#type' => 'container',
+    '#attributes' => [
+      'class' => ['puzz-colors-grid'],
+    ],
+  ];
+
+  // Reset all colors checkbox - first item in grid
+  $form['styles']['colors']['colors_grid']['reset_all_container'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['color-field-container', 'puzz-reset-all-container']],
+  ];
+
+  $form['styles']['colors']['colors_grid']['reset_all_container']['reset_all'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Reset all colors to defaults'),
+    '#description' => t('Check this to reset all modified colors to their default values.'),
+    '#default_value' => FALSE,
+    '#disabled' => TRUE, // Disabled by default, will be enabled by JS if any value differs from default
+    '#attributes' => [
+      'class' => ['js-puzz-reset-all'],
+    ],
+  ];
+
+  // Generate labels dynamically from keys
+  $labels = [];
+  foreach (array_keys($defaults) as $key) {
+    $label_parts = explode('_', $key);
+    $label_number = end($label_parts);
+    $labels[$key] = t('Color @number', ['@number' => $label_number]);
+  }
+
+  foreach ($defaults as $key => $default) {
+    $form['styles']['colors']['colors_grid'][$key . '_container'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['color-field-container']],
+    ];
+    
+    $form['styles']['colors']['colors_grid'][$key . '_container'][$key] = [
+      '#type' => 'color',
+      '#title' => $labels[$key],
+      '#default_value' => $colors[$key],
+      '#description' => t('Default: @default', ['@default' => $default]),
+      '#attributes' => [
+        'data-puzz-field-key' => $key,
+        'data-puzz-original-default' => strtolower($default),
+        'class' => ['js-puzz-color-field'],
+      ],
+    ];
+    
+    $form['styles']['colors']['colors_grid'][$key . '_container']['reset_' . $key] = [
+      '#type' => 'checkbox',
+      '#title' => t('Reset to default'),
+      '#default_value' => FALSE,
+      '#disabled' => TRUE,
+      '#attributes' => [
+        'class' => ['js-puzz-reset-toggle'],
+        'data-reset-target' => $key,
+        'data-reset-label' => (string) $labels[$key],
+        'data-reset-default' => strtolower($default),
+      ],
+    ];
+  }
+
+  // Submit handler to process resets
+  // Add with higher weight to run after base form submit handler
+  $form['#submit'][] = 'puzz_theme_settings_submit';
+}
+
+/**
+ * Submit handler to process color resets.
+ *
+ * Theme name is taken from the form's config_key (e.g. "puzz.settings"),
+ * not from the active theme, so it works when the admin theme (e.g. gin) is
+ * active and the user is saving Puzz theme settings.
+ */
+function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state): void {
+  $values = $form_state->getValues();
+  // Theme being configured: from form (e.g. "puzz.settings" -> "puzz").
+  $config_key = $form_state->getValue('config_key');
+  $theme_name = ($config_key && $config_key !== 'system.theme.global')
+    ? str_replace('.settings', '', $config_key)
+    : \Drupal::theme()->getActiveTheme()->getName();
+  $config = \Drupal::configFactory()->getEditable($theme_name . '.settings');
+  $defaults = puzz_get_color_defaults();
+
+  // Process color values from form
+  // First, save new color values if they were changed
+  foreach (array_keys($defaults) as $key) {
+    // Check if this field exists in form values and is not being reset
+    if (isset($values[$key]) && empty($values['reset_' . $key]) && empty($values['reset_all'])) {
+      $new_value = trim($values[$key]);
+      if (!empty($new_value)) {
+        $config->set($key, $new_value);
+      }
+    }
+  }
+
+  // If reset_all is checked, remove all color settings
+  if (!empty($values['reset_all'])) {
+    foreach (array_keys($defaults) as $key) {
+      $config->clear($key);
+    }
+  } else {
+    // Process individual resets
+    foreach (array_keys($defaults) as $key) {
+      if (!empty($values['reset_' . $key])) {
+        $config->clear($key);
+      }
+    }
+  }
+
+  $config->save();
+  
+  // Get colors directly from the config object we just saved (not from cache)
+  // This ensures we use the latest values immediately after saving
+  $colors = [];
+  foreach ($defaults as $key => $default) {
+    $setting_value = $config->get($key);
+    $colors[$key] = !empty($setting_value) ? $setting_value : $default;
+  }
+  
+  // Generate puzz.root.css file in public directory with current theme colors
+  _puzz_generate_root_css($theme_name, $colors);
+}
+
+/**
+ * Implements hook_file_download().
+ *
+ * Add CORS headers to puzz.root.css file so Storybook can access it.
+ */
+function puzz_file_download($uri) {
+  // Only handle puzz.root.css file
+  if ($uri === 'public://puzz.root.css') {
+    $headers = [
+      'Access-Control-Allow-Origin' => '*',
+      'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+      'Access-Control-Allow-Headers' => 'Content-Type',
+      'Content-Type' => 'text/css',
+    ];
+    return $headers;
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for html.html.twig.
+ *
+ * Design tokens: inject CSS Custom Properties from theme settings.
+ * Front uses var(--color-1), etc. Single source of truth: theme.settings (UI) or puzz.root.yml defaults.
+ */
+function puzz_preprocess_html(array &$variables): void {
+  $colors = puzz_get_colors();
+  $css_vars = [];
+
+  foreach ($colors as $key => $value) {
+    $css_var_name = '--' . str_replace('_', '-', $key);
+    $css_vars[] = "{$css_var_name}:{$value}";
+  }
+
+  if (!empty($css_vars)) {
+    $css = ':root{' . implode(';', $css_vars) . '}';
+
+    $variables['#attached']['html_head'][] = [
+      [
+        '#tag' => 'style',
+        '#value' => $css,
+        '#attributes' => [
+          'data-drupal-selector' => 'puzz-theme-variables',
+        ],
+      ],
+    ];
+  }
+  
+  // Pasar breakpoints a JavaScript mediante drupalSettings (leer directamente desde YAML)
+  $breakpoints = puzz_get_breakpoints();
+  if ($breakpoints && is_array($breakpoints)) {
+    $variables['#attached']['drupalSettings']['puzz']['breakpoints'] = $breakpoints;
+  }
+}
+
+/**
+ * Generates root.css file in public directory with current theme colors.
+ *
+ * This file is used by Storybook to load theme colors dynamically.
+ * Generated when theme settings are saved.
+ *
+ * @param string $theme_name
+ *   Theme machine name (e.g., 'puzz').
+ */
+/**
+ * Generates puzz.root.css file in public directory with current theme colors.
+ *
+ * This file is used by Storybook to load theme colors dynamically.
+ * Generated when theme settings are saved.
+ *
+ * @param string $theme_name
+ *   Theme machine name (e.g., 'puzz').
+ * @param array|null $colors
+ *   Optional array of colors. If not provided, will be fetched from config.
+ */
+function _puzz_generate_root_css(string $theme_name, ?array $colors = NULL): void {
+  // Use provided colors or fetch from config
+  if ($colors === NULL) {
+    $colors = puzz_get_colors($theme_name);
+  }
+  $css_vars = [];
+  
+  foreach ($colors as $key => $value) {
+    $css_var_name = '--' . str_replace('_', '-', $key);
+    $css_vars[] = "  {$css_var_name}: {$value};";
+  }
+  
+  if (empty($css_vars)) {
+    return;
+  }
+  
+  $css_content = "/**\n * Theme colors from Drupal UI settings ({$theme_name}.settings).\n * Generated automatically - do not edit manually.\n */\n:root {\n" . implode("\n", $css_vars) . "\n}\n";
+  
+  // Get public files directory using Drupal's file system service
+  $file_system = \Drupal::service('file_system');
+  $public_path = $file_system->realpath('public://');
+  
+  if (!$public_path) {
+    \Drupal::logger('puzz')->warning('Could not determine public files directory path.');
+    return;
+  }
+  
+  // Check if directory is writable
+  if (!is_writable($public_path)) {
+    \Drupal::logger('puzz')->warning('Public directory is not writable: @path', ['@path' => $public_path]);
+    return;
+  }
+  
+  $root_css_path = $public_path . '/puzz.root.css';
+  
+  // Ensure directory exists
+  if (!is_dir($public_path)) {
+    @mkdir($public_path, 0775, TRUE);
+  }
+  
+  // Write file
+  $result = @file_put_contents($root_css_path, $css_content);
+  
+  if ($result === FALSE) {
+    $error = error_get_last();
+    \Drupal::logger('puzz')->error('Failed to write puzz.root.css to public directory: @error', [
+      '@error' => $error['message'] ?? 'Unknown error',
+    ]);
+  } else {
+    // Set permissions
+    @chmod($root_css_path, 0664);
+  }
+}
+
+/**
+ * Gets the theme breakpoints from puzz.breakpoints.yml.
+ *
+ * Reads the YAML file directly using Symfony parser (same as puzz_get_color_defaults).
+ * Does not need to generate an intermediate JSON file.
+ *
+ * @return array
+ *   Associative array with numeric breakpoint values (xs, sm, md, lg, xl, xxl).
+ */
+function puzz_get_breakpoints(): array {
+  $theme_root = _puzz_theme_root();
+  $breakpoints_file = $theme_root . '/puzz.breakpoints.yml';
+  
+  if (!file_exists($breakpoints_file)) {
+    return [];
+  }
+  
+  try {
+    // Usar el parser YAML de Drupal (componente Symfony YAML) - igual que puzz_get_color_defaults
+    $yaml_content = file_get_contents($breakpoints_file);
+    if ($yaml_content === false) {
+      return [];
+    }
+    
+    $config = \Symfony\Component\Yaml\Yaml::parse($yaml_content);
+    if (!is_array($config)) {
+      return [];
+    }
+    
+    $breakpoints = [];
+    
+    // Parse breakpoints from format: default.xs, default.sm, etc.
+    foreach ($config as $key => $data) {
+      if (preg_match('/^default\.(\w+)$/', $key, $matches)) {
+        $breakpoint_key = $matches[1];
+        $media_query = $data['mediaQuery'] ?? '';
+        
+        // Extract min-width value from media query
+        // Format: "(min-width: 768px)" or "(max-width: 575px)"
+        $min_width = 0;
+        if (preg_match('/min-width:\s*(\d+)px/', $media_query, $width_matches)) {
+          $min_width = (int) $width_matches[1];
+        }
+        
+        $breakpoints[$breakpoint_key] = $min_width;
+      }
+    }
+    
+    // Sort breakpoints by key order
+    $order = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
+    uksort($breakpoints, function($a, $b) use ($order) {
+      $pos_a = array_search($a, $order);
+      $pos_b = array_search($b, $order);
+      return ($pos_a !== false && $pos_b !== false) ? $pos_a - $pos_b : 0;
+    });
+    
+    return $breakpoints;
+  } catch (\Exception $e) {
+    // Silently fail and return empty array
+    return [];
+  }
+}

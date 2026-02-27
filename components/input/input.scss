@@ -1,0 +1,70 @@
+/**
+ * @file
+ * Input form component styles.
+ */
+
+.puzz-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+
+  &__label {
+    color: var(--color-4);
+  }
+
+  &__required-indicator {
+    margin-left: 0.125rem;
+    color: red;
+  }
+
+  &__field {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    color: var(--color-4);
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-1);
+      outline-offset: 1px;
+      border-color: var(--color-1);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-1) 60%, transparent);
+    }
+
+    &:disabled {
+      background-color: rgba(0, 0, 0, 0.04);
+      color: rgba(0, 0, 0, 0.4);
+      cursor: not-allowed;
+    }
+  }
+
+  &__help {
+    margin: 0;
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--color-1) 20%, red);
+  }
+
+  &--error &__field {
+    border-color: color-mix(in srgb, var(--color-1) 20%, red);
+  }
+
+  &--disabled &__label {
+    color: rgba(0, 0, 0, 0.4);
+  }
+}
+
