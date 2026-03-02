@@ -20,25 +20,20 @@
 </div>
 
 <div id="navbar-collapse">
-
   <header id="header" role="banner">
     <div class="container">
       <div id="header-wrapper">
         {{ page.header }}
+        {% if page.menu %}
+        <div id="menu" class="main-navigation">
+          {{ page.menu }}
+        </div>
+        {% endif %}
         {{ page.header_menu }}
         {{ page.header_search }}
       </div>
     </div>
   </header>
-
-  {% if page.menu %}
-  <div id="menu" class="main-navigation">
-    <div class="container">
-      {{ page.menu }}
-    </div>
-  </div>
-  {% endif %}
-
 </div>
 
 {# Hero component #}
