@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Theme override for field_sections on landing.
+ * Asegura que los ítems (párrafos Section en view mode component) se rendericen.
+ *
+ * Available variables: same as field.html.twig
+ * - items: list of field items, each with .content (render array del párrafo).
+ */
+#}
+
+{% set classes = [
+  'field',
+  'field--name-field-sections',
+  'field--type-entity-reference-revisions',
+  'field--label-' ~ label_display,
+] %}
+{% set title_classes = [
+  'field__label',
+  label_display == 'visually_hidden' ? 'visually-hidden',
+] %}
+
+{% if label_hidden %}
+  <div{{ attributes.addClass(classes, 'field__items') }}>
+    {% for item in items %}
+      <div{{ item.attributes.addClass('field__item') }}>{{ item.content }}</div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div{{ attributes.addClass(classes) }}>
+    <div{{ title_attributes.addClass(title_classes) }}>{{ label }}</div>
+    <div class="field__items">
+      {% for item in items %}
+        <div{{ item.attributes.addClass('field__item') }}>{{ item.content }}</div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}

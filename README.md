@@ -301,6 +301,49 @@ props:
       default: medium
 ```
 
+## 📄 Párrafos en view mode "component"
+
+Los tipos de párrafo del ecosistema **puzz_component** (Section, Background image, etc.) se renderizan en el tema cuando usan el view mode **"component"**. El tema no altera el build en los módulos; toda la lógica de render está en el tema.
+
+### Flujo
+
+1. **Preprocess** (`includes/preprocess.paragraph.inc`): para cada párrafo en view mode `component`, según el bundle (section, background_image, …) se rellenan `component`, `props` y, si aplica, `label_display` y `label_text` desde el Manage display.
+2. **Plantilla de párrafo**: `paragraph--{bundle}--component.html.twig` solo invoca el componente SDC con esas props (`#type` => `component`, `#component`, `#props`). Si no hay `component`/`props`, se hace fallback a `{{ content }}`.
+3. **Componente SDC**: el componente del tema (p. ej. `puzz:section`, `puzz:background_image`) recibe las props y, si vienen `label_display` y `label_text`, pinta el label (above/below) él mismo.
+
+### Archivos implicados
+
+| Rol | Archivo |
+|-----|--------|
+| Preprocess | `includes/preprocess.paragraph.inc` → `_puzz_paragraph_section_component()`, `_puzz_paragraph_background_image_component()` |
+| Plantillas párrafo | `templates/paragraph/paragraph--section--component.html.twig`, `paragraph--background_image--component.html.twig` |
+| Componentes | `components/section/section.twig`, `components/background_image/background_image.twig` |
+
+### Patrón unificado
+
+Todas las plantillas de párrafo en view mode component siguen el mismo patrón (igual que `input.html.twig`):
+
+```twig
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:nombre_componente',
+    '#props': props
+  } }}
+{% else %}
+  {{ content }}
+{% endif %}
+```
+
+El **label del Manage display** (above/below/hidden) se pasa en props (`label_display`, `label_text`) y lo renderiza el propio componente, no la plantilla del párrafo.
+
+### Añadir un nuevo tipo de párrafo "component"
+
+1. En el módulo: definir el paragraph type, campos y displays (view mode "component").
+2. En el tema: en `preprocess.paragraph.inc`, añadir `elseif ($paragraph->bundle() === 'mi_tipo')` y una función `_puzz_paragraph_mi_tipo_component($variables, $paragraph)` que rellene `$variables['component']`, `$variables['props']` y, si quieres label, `label_display` y `label_text` desde el display.
+3. En el tema: crear `templates/paragraph/paragraph--mi-tipo--component.html.twig` con el mismo bloque de arriba (sustituyendo `puzz:nombre_componente` por el ID del componente).
+4. En el componente: si usa label, en el `.twig` del componente pintar `field__label` above/below según las props.
+
 ## 🔧 Configuración
 
 ### URL de Drupal

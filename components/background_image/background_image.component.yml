@@ -1,0 +1,44 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Background image
+description: 'Sección con imagen de fondo. Pensado para usarse desde el paragraph type Background image.'
+group: Layout
+
+libraryOverrides:
+  dependencies:
+    - puzz/background_image
+
+props:
+  type: object
+  properties:
+    image_url:
+      type: string
+      title: Image URL
+      description: URL de la imagen de fondo.
+      format: uri
+    image_alt:
+      type: string
+      title: Image alt
+      description: Texto alternativo de la imagen.
+    content:
+      type: string
+      title: Content
+      description: Contenido opcional sobre la imagen (slot).
+    overlay:
+      type: string
+      title: Overlay
+      description: Variante de overlay sobre la imagen.
+      enum:
+        - none
+        - dark
+        - light
+      default: none
+    label_display:
+      type: string
+      title: Label display
+      description: Posición del label del campo (above, below, hidden).
+      enum: [ above, below, hidden ]
+      default: hidden
+    label_text:
+      type: string
+      title: Label text
+      description: Texto del label (desde Manage display).

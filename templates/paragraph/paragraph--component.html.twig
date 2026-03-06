@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Theme override for a paragraph in view mode "component".
+ *
+ * Used when paragraphs are displayed with the "Component" view mode
+ * (provided by the puzz_component module). The actual output is built by
+ * each puzz_component_xxx module via hook_entity_view() (e.g. SDC
+ * puzz:background_image). This template only wraps the render array.
+ *
+ * Available variables:
+ * - paragraph: The paragraph entity.
+ * - content: Render array (often replaced by the component render array).
+ * - view_mode: View mode; here "component".
+ * - attributes: HTML attributes for the wrapper.
+ *
+ * @see puzz_component_background_image_entity_view()
+ */
+#}
+{%
+  set classes = [
+    'paragraph',
+    'paragraph--view-mode-' ~ view_mode|clean_class,
+    'paragraph--type-' ~ paragraph.bundle()|clean_class,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ content }}
+</div>

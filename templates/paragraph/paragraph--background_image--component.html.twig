@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Background image en view mode "component": renderiza vía componente SDC (puzz:background_image).
+ * Misma lógica que paragraph--section--component: solo se invoca el componente con props.
+ * El label lo renderiza el propio componente (props label_display, label_text).
+ *
+ * @see includes/preprocess.paragraph.inc
+ */
+#}
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:background_image',
+    '#props': props
+  } }}
+{% else %}
+  {{ content }}
+{% endif %}

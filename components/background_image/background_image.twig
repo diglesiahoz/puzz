@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Background image component. Opcional label (above/below) desde props.
+ * Solo la URL en línea; el resto en background_image.scss.
+ */
+#}
+{% set classes = [
+  'background-image',
+  overlay|default('none') != 'none' ? 'background-image--overlay-' ~ overlay : '',
+] %}
+{% if label_display|default('hidden') == 'above' and label_text|default('') is not empty %}
+  <div class="field__label">{{ label_text }}</div>
+{% endif %}
+<div class="{{ classes|filter(v => v is not empty)|join(' ') }}"
+  {% if image_url is defined and image_url is not empty %}style="--background-image-url: url('{{ image_url|e('html_attr') }}');"{% endif %}>
+  <div class="background-image__image" role="img"
+    {% if image_alt is defined and image_alt is not empty %}aria-label="{{ image_alt|default('')|e('html_attr') }}"{% endif %}></div>
+  {% if content is defined and content is not empty %}
+    <div class="background-image__content">
+      {{ content|raw }}
+    </div>
+  {% endif %}
+</div>
+{% if label_display|default('hidden') == 'below' and label_text|default('') is not empty %}
+  <div class="field__label">{{ label_text }}</div>
+{% endif %}

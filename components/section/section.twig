@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Section component: contenedor con contenido. Opcional label (above/below) desde props.
+ */
+#}
+<section class="section">
+  {% if label_display|default('hidden') == 'above' and label_text|default('') is not empty %}
+    <div class="field__label">{{ label_text }}</div>
+  {% endif %}
+  {% if content is not empty %}
+    <div class="section__content">
+      {{ content|raw }}
+    </div>
+  {% endif %}
+  {% if label_display|default('hidden') == 'below' and label_text|default('') is not empty %}
+    <div class="field__label">{{ label_text }}</div>
+  {% endif %}
+</section>

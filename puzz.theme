@@ -8,6 +8,7 @@
 // Load preprocess logic split into separate include files.
 require_once __DIR__ . '/includes/preprocess.input.inc';
 require_once __DIR__ . '/includes/preprocess.form_element.inc';
+require_once __DIR__ . '/includes/preprocess.paragraph.inc';
 
 /**
  * Drupal translation function stub for IDE/linter support.
@@ -31,6 +32,35 @@ if (!function_exists('t')) {
  */
 function _puzz_theme_root(): string {
   return \Drupal::root() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz');
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Define/override theme hooks para que las plantillas se busquen en el tema.
+ */
+function puzz_theme($existing, $type, $theme, $path): array {
+  return [
+    'puzz_section' => [
+      'variables' => [
+        'children' => [],
+      ],
+      'template' => 'puzz-section',
+      'path' => $path . '/templates',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for puzz_section.
+ *
+ * Asegura que la plantilla del tema reciba children (render array de los hijos).
+ */
+function puzz_preprocess_puzz_section(array &$variables): void {
+  // Asegurar que children esté definido (por si el módulo no lo pasó).
+  if (!isset($variables['children'])) {
+    $variables['children'] = [];
+  }
 }
 
 /**
