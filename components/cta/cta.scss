@@ -3,6 +3,8 @@
  * CTA button component styles.
  */
 
+@use '../../src/scss/partials/base/variables' as *;
+
 .cta {
   display: inline-block;
   padding: 0.75rem 1.5rem;
@@ -28,35 +30,35 @@
 
   // Variants
   &--primary {
-    background-color: var(--color-1);
+    background-color: $color-1;
     color: #ffffff;
 
     &:hover,
     &:focus {
-      background-color: var(--color-3);
+      background-color: $color-3;
       color: #ffffff;
     }
   }
 
   &--secondary {
-    background-color: var(--color-2);
+    background-color: $color-2;
     color: #ffffff;
 
     &:hover,
     &:focus {
-      background-color: var(--color-3);
+      background-color: $color-3;
       color: #ffffff;
     }
   }
 
   &--outline {
     background-color: transparent;
-    color: var(--color-1);
-    border-color: var(--color-1);
+    color: $color-1;
+    border-color: $color-1;
 
     &:hover,
     &:focus {
-      background-color: var(--color-1);
+      background-color: $color-1;
       color: #ffffff;
     }
   }

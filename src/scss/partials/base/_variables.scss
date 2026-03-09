@@ -10,6 +10,18 @@
  * Use @use 'breakpoints' as *; to import breakpoint variables.
  */
 
+// Colors
+$color-1: var(--color-1);
+$color-2: var(--color-2);
+$color-3: var(--color-3);
+$color-4: var(--color-4);
+$color-5: var(--color-5);
+$color-white: #FFFFFF;
+$color-black: #000000;
+$color-grey-1: color-mix(in srgb, $color-black 25%, $color-white);
+$color-grey-2: color-mix(in srgb, $color-black 50%, $color-white);
+$color-grey-3: color-mix(in srgb, $color-black 75%, $color-white);
+
 // Typography
 $font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 $font-family-heading: $font-family-base;

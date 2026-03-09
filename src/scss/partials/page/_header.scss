@@ -25,7 +25,7 @@
     padding: 0;
     background: #ffffff;
     box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0.1rem 0.8rem var(--color-3);
+    box-shadow: 0 0.1rem 0.8rem $color-3;
 
     .block-system-branding-block {
       float: left;
@@ -52,7 +52,7 @@
         .title {
           .site-name {
             display: block;
-            color: var(--color-3);
+            color: $color-3;
             font-family: 'Geologica', sans-serif;
             font-size: 1.875rem;
             font-weight: 600;
@@ -85,7 +85,7 @@
         width: 1.875rem;
         height: 0.1875rem;
         margin: 0.4375rem auto;
-        background: var(--color-4);
+        background: $color-black;
       }
 
       span.icon-menu-1,
@@ -148,7 +148,7 @@
     padding-top: 3.125rem;
     padding-bottom: 3.125rem;
     color: #ffffff;
-    background: var(--color-3);
+    background: $color-3;
   }
 
   // ============================================================================
@@ -215,7 +215,7 @@
             padding: 0.5rem 0;
             text-decoration: none;
             color: #ffffff;
-            //border-bottom: 0.09375rem solid var(--color-4);
+            //border-bottom: 0.09375rem solid $color-black;
             font-family: 'Geologica', sans-serif;
             font-size: 1.625rem;
 
@@ -288,7 +288,7 @@
   // ============================================================================
   #header {
 
-    //background: linear-gradient(0deg, var(--color-3), var(--color-4));
+    //background: linear-gradient(0deg, $color-3, $color-black);
 
     body.menu-open & {
       order: 2;
@@ -409,7 +409,7 @@
               text-decoration: none;
               font-size: 1.125rem;
               line-height: 1.875rem;
-              color: var(--color-5);
+              color: $color-white;
 
               &[data-drupal-link-system-path='user'] {
                 padding-left: 2.3125rem;
@@ -429,7 +429,7 @@
                 background-size: auto 1.875rem;
 
                 &.is-active {
-                  color: var(--color-1);
+                  color: $color-1;
                 }
               }
             }
@@ -491,7 +491,7 @@
                   white-space: normal;
 
                   &.is-active {
-                    color: var(--color-1);
+                    color: $color-1;
                   }
                 }
               }
@@ -534,9 +534,9 @@
           background-size: 1.125rem 1.125rem;
 
           &:hover {
-            color: var(--color-4);
-            border-color: var(--color-1);
-            background-color: var(--color-2);
+            color: $color-black;
+            border-color: $color-1;
+            background-color: $color-2;
             background-image: url('../assets/images/search-hover.svg');
           }
         }
@@ -553,9 +553,9 @@
 
           .form-search {
             height: 3.4375rem;
-            color: var(--color-4);
+            color: $color-black;
             border-width: 1.5px;
-            border-color: var(--color-4);
+            border-color: $color-black;
             background: transparent;
           }
         }
@@ -569,15 +569,15 @@
             padding-left: 0;
             text-indent: 18.75rem;
             border-width: 1.5px;
-            border-color: var(--color-4);
-            background-color: var(--color-4);
+            border-color: $color-black;
+            background-color: $color-black;
             background-position: 50% 50%;
             background-size: 1.125rem 1.125rem;
 
             &:hover {
               border-width: 1.5px;
-              border-color: var(--color-4);
-              background-color: var(--color-4);
+              border-color: $color-black;
+              background-color: $color-black;
               background-image: url('../assets/images/search.svg');
             }
           }
@@ -687,7 +687,7 @@
       position: relative;
       margin-left: auto;
       overflow: visible;
-      //background: linear-gradient(90deg, var(--color-3), var(--color-4));
+      //background: linear-gradient(90deg, $color-3, $color-black);
       height: 100%;
       //background: green;
       display: flex;
@@ -778,7 +778,7 @@
               white-space: nowrap;
               text-decoration: none;
               //color: #ffffff;
-              color: var(--color-3);
+              color: $color-3;
               font-family: 'Geologica', sans-serif;
               font-size: 1.125rem;
               font-weight: 500;
@@ -787,17 +787,18 @@
 
             > a.is-active,
             &.menu-item--active-trail > a {
-              //background-color: var(--color-1);
+              //background-color: $color-1;
 
               &:hover {
-                //background-color: var(--color-5);
+                //background-color: $color-white;
               }
             }
 
             &:hover {
               > a,
               > span {
-                //background-color: var(--color-5);
+                //background-color: $color-white;
+                text-decoration: underline;
               }
             }
 
@@ -815,7 +816,7 @@
             }
             &:hover {
               > a {
-                //background-color: var(--color-4);
+                //background-color: $color-black;
               }
 
               > ul.menu {
@@ -842,7 +843,7 @@
 
                 padding: 1rem var(--puzz-submenu-offset);
 
-                background: linear-gradient(90deg, var(--color-3), var(--color-4));
+                background: linear-gradient(90deg, $color-3, $color-black);
                 /* Puente invisible: cubre el hueco para no perder el hover al bajar el ratón */
                 &::before {
                   content: '';
@@ -872,11 +873,11 @@
                   flex: 0 0 auto;
 
                   &:first-child {
-                    //border-top: 0.5rem solid var(--color-4);
+                    //border-top: 0.5rem solid $color-black;
                   }
 
                   &:last-child {
-                    //border-bottom: 0.5rem solid var(--color-4);
+                    //border-bottom: 0.5rem solid $color-black;
                   }
 
                   &.menu-item--expanded > a {
@@ -899,7 +900,8 @@
 
                     &:hover {
                       color: #fff;
-                      //background-color: var(--color-1);
+                      //background-color: $color-1;
+                      text-decoration: underline;
                     }
                   }
 
@@ -912,7 +914,7 @@
                     min-width: 12rem;
                     display: block;
                     padding: 0;
-                    background: var(--color-4);
+                    background: $color-black;
                     border-left: 0.0625rem solid transparent;
                   }
 
@@ -933,7 +935,7 @@
 
     #header {
       overflow: visible;
-      box-shadow: 0 0.1rem 0.8rem var(--color-3);
+      box-shadow: 0 0.1rem 0.8rem $color-3;
       //height: 100px;
       height: auto;
       display: flex;
@@ -1005,7 +1007,7 @@
 
               .site-name {
                 display: block;
-                color: var(--color-3);
+                color: $color-3;
                 font-family: 'Geologica', sans-serif;
                 font-size: 1.875rem;
                 font-weight: 600;
@@ -1016,7 +1018,7 @@
                 position: relative;
                 top: -0.3125rem;
                 display: block;
-                color: var(--color-3);
+                color: $color-3;
                 font-family: 'Geologica', sans-serif;
                 font-size: 0.9375rem;
                 font-weight: 100;
@@ -1054,7 +1056,7 @@
           white-space: nowrap;
           text-decoration: none;
           text-transform: uppercase;
-          color: color-mix(in srgb, var(--color-2) 25%, transparent);
+          color: color-mix(in srgb, $color-2 25%, transparent);
           font-weight: 800;
           line-height: 5.5rem;
         }
@@ -1074,7 +1076,7 @@
               a {
                 display: block;
                 padding: 0.3125rem 0;
-                color: var(--color-4);
+                color: $color-black;
                 font-size: 0.875rem;
                 font-weight: 600;
 
@@ -1096,7 +1098,7 @@
                   background-size: auto 1.125rem;
 
                   &.is-active {
-                    color: var(--color-1);
+                    color: $color-1;
                   }
                 }
               }
@@ -1120,7 +1122,7 @@
 
                 a {
                   display: block;
-                  color: var(--color-4);
+                  color: $color-black;
                   font-size: 0.875rem;
                   line-height: normal;
                   padding: 0.3125rem 0;
@@ -1188,7 +1190,7 @@ nav {
 
     &:hover,
     &:focus {
-      color: var(--color-1);
+      color: $color-1;
       text-decoration: none;
     }
   }

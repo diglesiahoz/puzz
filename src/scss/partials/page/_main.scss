@@ -36,7 +36,7 @@
 // Sidebar styles
 .sidebar {
   margin: 0 0 2.5rem 0;
-  color: color-mix(in srgb, var(--color-2) 25%, transparent);
+  color: color-mix(in srgb, $color-2 25%, transparent);
 
   .block {
     margin-bottom: 3.75rem;
@@ -48,7 +48,7 @@
     & > h2 {
       margin: 0 0 1.875rem 0;
       padding: 0.9375rem 0.9375rem 0 0;
-      color: var(--color-4);
+      color: $color-black;
       font-size: 1.125rem;
       font-weight: 700;
     }
@@ -77,22 +77,22 @@
             display: block;
             padding: 0.875rem 0.625rem 0.75rem 0.625rem;
             text-decoration: none;
-            color: color-mix(in srgb, var(--color-4) 80%, transparent);
-            border-bottom: 0.0625rem solid var(--color-2);
+            color: color-mix(in srgb, $color-black 80%, transparent);
+            border-bottom: 0.0625rem solid $color-2;
             background: #ffffff;
             font-size: 0.875rem;
             font-weight: 700;
 
             &.is-active {
-              background: color-mix(in srgb, var(--color-2) 25%, transparent);
+              background: color-mix(in srgb, $color-2 25%, transparent);
 
               &:hover {
-                background: color-mix(in srgb, var(--color-2) 25%, transparent);
+                background: color-mix(in srgb, $color-2 25%, transparent);
               }
             }
 
             &:hover {
-              background: color-mix(in srgb, var(--color-2) 25%, transparent);
+              background: color-mix(in srgb, $color-2 25%, transparent);
             }
           }
 

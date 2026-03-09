@@ -3,11 +3,13 @@
  * Background image component styles.
  */
 
+@use '../../src/scss/partials/base/variables' as *;
+
 .background-image {
   position: relative;
   isolation: isolate;
   min-height: 12rem;
-  background-color: var(--color-neutral-light, #eee);
+  background-color: $color-grey-1;
 
   &__image {
     position: absolute;
@@ -29,13 +31,13 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: $color-grey-1;
   }
 
   &--overlay-light .background-image__image::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.35);
+    background: $color-grey-2;
   }
 }

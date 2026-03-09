@@ -64,7 +64,7 @@
 /**
  * Focus styles
  */
-@mixin focus-outline($color: var(--color-1), $offset: 2px) {
+@mixin focus-outline($color: $color-1, $offset: 2px) {
   outline: 2px solid $color;
   outline-offset: $offset;
 }
