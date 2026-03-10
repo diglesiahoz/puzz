@@ -15,8 +15,18 @@
 // ============================================================================
 // CONTAINER
 // ============================================================================
-.container {
-  padding: 0 1.875rem;
+body:not(.page-node-type-puzz-landing) {
+  .container {
+    padding: 0 1.875rem;
+  }
+}
+
+body.page-node-type-puzz-landing {
+  #center.no-sidebars > .container,
+  #main {
+    min-width: 100%;
+    max-width: 100%;
+  }
 }
 
 // ============================================================================

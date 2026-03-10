@@ -3,22 +3,19 @@ name: Section
 description: 'Sección contenedora con contenido (usado por el paragraph type Section).'
 group: Layout
 
-# La librería puzz/section se registra en hook_library_info_alter() y apunta a build/components/section/
-# Incluimos puzz/background_image porque el section suele contener ese componente y su HTML se pre-renderiza (las librerías de los hijos no se adjuntan).
 libraryOverrides:
   dependencies:
     - puzz/section
-    - puzz/background_image
 
 props:
   type: object
   properties:
     content:
-      type: string
+      type: object
       title: Content
-      description: Contenido HTML de la sección (p. ej. cuerpo del párrafo).
+      description: Render array o contenido renderizable de la sección.
       examples:
-        - '<p>Contenido de la sección.</p>'
+        - {}
     label_display:
       type: string
       title: Label display

@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * Paragraph Puzz Section en su view mode específico.
+ */
+#}
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:section',
+    '#props': props
+  } }}
+{% else %}
+  {{ content }}
+{% endif %}

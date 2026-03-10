@@ -430,6 +430,33 @@ function puzz_file_download($uri) {
 }
 
 /**
+ * Implements hook_preprocess_block()
+ */
+function puzz_preprocess_block(array &$variables) {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node instanceof \Drupal\node\NodeInterface && $node->bundle() === 'puzz_landing') {
+    // No renderiza breadcrumb
+    if ($variables['plugin_id'] === 'system_breadcrumb_block') {
+      $variables['content'] = [];
+    }
+    // No renderiza h1
+    if (!empty($variables['plugin_id']) && $variables['plugin_id'] === 'page_title_block') {
+      $variables['content'] = [];
+    }
+  }
+}
+
+/**
+ * Implements puzz_preprocess_page()
+ */
+function puzz_preprocess_page(array &$variables) {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node && $node->bundle() === 'puzz_landing') {
+    // @todo
+  }
+}
+
+/**
  * Implements hook_preprocess_HOOK() for html.html.twig.
  *
  * Design tokens: inject CSS Custom Properties from theme settings.

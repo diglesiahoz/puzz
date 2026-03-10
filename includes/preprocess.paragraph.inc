@@ -4,120 +4,157 @@
  * @file
  * Preprocess for paragraph templates in the Puzz theme.
  *
- * Maps paragraph types in view mode "component" to SDC components (puzz:section, etc.)
- * by setting $variables['component'] and $variables['props'], igual que preprocess.input.inc.
+ * Maps normalized paragraph bundles and view modes to SDC components.
  *
- * @see templates/paragraph/paragraph--section--component.html.twig
+ * @see templates/paragraph/paragraph--puzz-c-section--puzz-c-section.html.twig
  */
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\Core\Url;
+use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\paragraphs\ParagraphInterface;
 
 /**
  * Implements hook_preprocess_HOOK() for paragraph.
  *
- * En view mode "component" prepara component + props (y label del display) para
- * section y background_image; la plantilla correspondiente renderiza el SDC.
+ * En los view modes específicos de cada paragraph prepara component + props;
+ * la plantilla correspondiente renderiza el SDC.
  */
 function puzz_preprocess_paragraph(array &$variables): void {
   $elements = $variables['elements'] ?? [];
   $paragraph = $variables['paragraph'] ?? $elements['#paragraph'] ?? NULL;
   $view_mode = $variables['view_mode'] ?? $elements['#view_mode'] ?? '';
 
-  if (!$paragraph || $view_mode !== 'component') {
+  if (!$paragraph) {
     return;
   }
 
-  if ($paragraph->bundle() === 'section') {
+  if ($paragraph->bundle() === 'puzz_section' && $view_mode === 'puzz_section') {
     _puzz_paragraph_section_component($variables, $paragraph);
     return;
   }
 
-  if ($paragraph->bundle() === 'background_image') {
-    _puzz_paragraph_background_image_component($variables, $paragraph);
+  if ($paragraph->bundle() === 'puzz_header' && $view_mode === 'puzz_header') {
+    _puzz_paragraph_header_component($variables, $paragraph);
+    return;
   }
+
 }
 
 /**
- * Prepara component + props para el paragraph type "section" en view mode "component".
- * Respeta la posición del label de field_component según el display.
+ * Prepara component + props para el paragraph type de section.
  */
 function _puzz_paragraph_section_component(array &$variables, ParagraphInterface $paragraph): void {
-  $content_html = '';
+  $content_build = [];
+  $field_name = $paragraph->hasField('field_puzz_section_component')
+    ? 'field_puzz_section_component'
+    : ($paragraph->hasField('field_component') ? 'field_component' : NULL);
 
-  if ($paragraph->hasField('field_component') && !$paragraph->get('field_component')->isEmpty()) {
-    $children = $paragraph->get('field_component')->referencedEntities();
+  if ($field_name !== NULL && !$paragraph->get($field_name)->isEmpty()) {
+    /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_items */
+    $field_items = $paragraph->get($field_name);
+    $children = $field_items->referencedEntities();
     if ($children !== []) {
       $view_builder = \Drupal::entityTypeManager()->getViewBuilder('paragraph');
-      $children_build = $view_builder->viewMultiple($children, 'component');
-      $content_html = (string) \Drupal::service('renderer')->renderRoot($children_build);
+      foreach ($children as $delta => $child) {
+        $child_view_mode = str_starts_with($child->bundle(), 'puzz_')
+          ? $child->bundle()
+          : 'default';
+        $content_build[$delta] = $view_builder->view($child, $child_view_mode);
+      }
     }
   }
 
-  // Respetar label del display (above/below/hidden) para field_component.
   $label_display = 'hidden';
   $label_text = '';
+  /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface|null $display */
   $display = \Drupal::entityTypeManager()
     ->getStorage('entity_view_display')
-    ->load('paragraph.section.component');
-  if ($display && $paragraph->hasField('field_component')) {
-    $component = $display->getComponent('field_component');
+    ->load('paragraph.' . $paragraph->bundle() . '.' . ($variables['view_mode'] ?? 'puzz_section'));
+  if ($display && $field_name !== NULL && $paragraph->hasField($field_name)) {
+    $component = $display->getComponent($field_name);
     if (!empty($component['label']) && $component['label'] !== 'hidden') {
       $label_display = $component['label'];
-      $label_text = (string) $paragraph->get('field_component')->getFieldDefinition()->getLabel();
+      $label_text = (string) $paragraph->get($field_name)->getFieldDefinition()->getLabel();
     }
   }
 
   $variables['component'] = 'puzz:section';
   $variables['props'] = [
-    'content' => $content_html,
+    'content' => $content_build,
     'label_display' => $label_display,
     'label_text' => $label_text,
   ];
 }
 
 /**
- * Prepara component + props para el paragraph type "background_image" en view mode "component".
- * Respeta la posición del label del display (above/below/hidden) para el campo de media.
+ * Prepara component + props para el paragraph type "puzz_header".
  */
-function _puzz_paragraph_background_image_component(array &$variables, ParagraphInterface $paragraph): void {
-  $media_field_name = $paragraph->hasField('field_media') && !$paragraph->get('field_media')->isEmpty()
-    ? 'field_media'
-    : ($paragraph->hasField('field_background_media') && !$paragraph->get('field_background_media')->isEmpty() ? 'field_background_media' : NULL);
-  if ($media_field_name === NULL) {
-    return;
+function _puzz_paragraph_header_component(array &$variables, ParagraphInterface $paragraph): void {
+  $caption = $paragraph->hasField('field_puzz_header_caption') && !$paragraph->get('field_puzz_header_caption')->isEmpty()
+    ? (string) $paragraph->get('field_puzz_header_caption')->value
+    : '';
+  $heading = $caption !== '' ? $caption : _puzz_get_current_page_title();
+
+  $image_url = '';
+  $image_alt = '';
+  if ($paragraph->hasField('field_puzz_header_image') && !$paragraph->get('field_puzz_header_image')->isEmpty()) {
+    $media = $paragraph->get('field_puzz_header_image')->entity;
+    if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+      $image_item = $media->get('field_media_image')->first();
+      if ($image_item && $image_item->entity) {
+        $file_url_generator = \Drupal::service('file_url_generator');
+        $image_url = (string) $file_url_generator->generateAbsoluteString($image_item->entity->getFileUri());
+        $image_alt = (string) ($image_item->alt ?? '');
+      }
+    }
   }
 
-  $media = $paragraph->get($media_field_name)->entity;
-  if (!$media || !$media->hasField('field_media_image') || $media->get('field_media_image')->isEmpty()) {
-    return;
+  $link_url = '';
+  $link_title = '';
+  if ($paragraph->hasField('field_puzz_header_link') && !$paragraph->get('field_puzz_header_link')->isEmpty()) {
+    /** @var \Drupal\link\Plugin\Field\FieldType\LinkItem|null $link_item */
+    $link_item = $paragraph->get('field_puzz_header_link')->first();
+    if ($link_item) {
+      $link_url = Url::fromUri($link_item->uri)->toString();
+      $link_title = (string) ($link_item->title ?? '');
+    }
   }
 
-  $image_item = $media->get('field_media_image')->first();
-  if (!$image_item || !$image_item->entity) {
-    return;
-  }
-
-  $file_url_generator = \Drupal::service('file_url_generator');
-  $image_url = (string) $file_url_generator->generateAbsoluteString($image_item->entity->getFileUri());
-  $image_alt = (string) ($image_item->alt ?? '');
-
-  $variables['component'] = 'puzz:background_image';
+  $variables['component'] = 'puzz:header';
   $variables['props'] = [
+    'caption' => $caption,
+    'heading' => $heading,
     'image_url' => $image_url,
     'image_alt' => $image_alt,
-    'overlay' => 'dark',
+    'link_url' => $link_url,
+    'link_title' => $link_title,
     'label_display' => 'hidden',
     'label_text' => '',
   ];
-
-  // Respetar label del display (above/below/hidden) para el campo de media.
-  $display = \Drupal::entityTypeManager()
-    ->getStorage('entity_view_display')
-    ->load('paragraph.background_image.component');
-  if ($display) {
-    $component_config = $display->getComponent($media_field_name);
-    $label_display = $component_config ? ($component_config['label'] ?? 'hidden') : 'hidden';
-    $variables['props']['label_display'] = $label_display;
-    $variables['props']['label_text'] = (string) $paragraph->get($media_field_name)->getFieldDefinition()->getLabel();
-  }
 }
+
+/**
+ * Obtiene el título actual de página para usarlo como H1 de fallback.
+ */
+function _puzz_get_current_page_title(): string {
+  $route_match = \Drupal::routeMatch();
+  $node = $route_match->getParameter('node');
+
+  if ($node instanceof \Drupal\node\NodeInterface) {
+    return (string) $node->label();
+  }
+
+  $request = \Drupal::requestStack()->getCurrentRequest();
+  $route = $route_match->getRouteObject();
+  if ($request && $route) {
+    $title = \Drupal::service('title_resolver')->getTitle($request, $route);
+    if (is_string($title) || $title instanceof \Stringable) {
+      return (string) $title;
+    }
+  }
+
+  return '';
+}
+

@@ -1,0 +1,39 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Header
+description: 'Header component used by the paragraph type Puzz component header.'
+group: Layout
+
+libraryOverrides:
+  dependencies:
+    - puzz/header
+    - puzz/cta
+
+props:
+  type: object
+  properties:
+    caption:
+      type: string
+      title: Caption
+    heading:
+      type: string
+      title: Heading
+    image_url:
+      type: string
+      title: Image URL
+      format: uri
+    image_alt:
+      type: string
+      title: Image alt
+    link_url:
+      type: string
+      title: Link URL
+    link_title:
+      type: string
+      title: Link title
+    label_display:
+      type: string
+      enum: [ above, below, hidden ]
+      default: hidden
+    label_text:
+      type: string
+      title: Label text

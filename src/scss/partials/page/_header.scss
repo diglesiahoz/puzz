@@ -297,6 +297,8 @@
       #header-wrapper {
         display: flex;
         flex-direction: column;
+        justify-content: flex-start;
+        padding: 0 2rem;
 
         .region-header-search {
           order: 1;

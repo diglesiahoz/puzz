@@ -7,146 +7,6 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as *;
 
-/*
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  margin: 0 !important;
-  padding: 0 !important;
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: clamp(1rem, 0.833vw + 0rem, 4rem);
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  margin: 0 !important;
-  padding: 0 !important;
-  color: $color-black;
-  font-size: 18px;
-  line-height: 1.5;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  
-  // Ensure no spacing at top in mobile
-  @media (max-width: 849px) {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-}
-
-// Remove default margins
-h1, h2, h3, h4, h5, h6,
-p, blockquote, pre,
-dl, dd, ol, ul,
-figure,
-hr {
-  margin: 0;
-}
-
-// Lists
-ul, ol {
-  padding-left: 0;
-  list-style: none;
-}
-
-// Links
-a {
-  color: $color-1;
-  text-decoration: none;
-  transition: $transition-1;
-
-  &:hover,
-  &:focus {
-    text-decoration: underline;
-  }
-
-  &:focus {
-    @include focus-outline;
-  }
-}
-
-// Images
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-// Buttons
-button {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-
-// Form elements
-input,
-textarea,
-select,
-button {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="search"],
-input[type="tel"],
-input[type="url"],
-textarea,
-select {
-  width: 100%;
-  padding: $spacing-sm $spacing-md;
-  border: 1px solid #dee2e6;
-  //border-radius: $border-radius-md;
-  border-radius: 0.25rem;
-  transition: $transition-1;
-
-  &:focus {
-    outline: none;
-    border-color: $color-1;
-    @include focus-outline;
-  }
-}
-
-// Tables
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-// Remove default button styles
-button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-// Reset Drupal containers
-.layout-container,
-.page-wrapper {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-*/
-
 *,
 ::after,
 ::before,
@@ -167,7 +27,7 @@ html {
 }
 body {
   overflow-x: hidden;
-  color: var(--black);
+  color: $color-black;
   font-size: 1.125rem;
   line-height: 1.5;
 }
@@ -177,13 +37,13 @@ blockquote {
 blockquote p {
   margin: 0;
   padding: 0.9375rem;
-  background: var(--gray-40);
+  background: $color-grey-2;
 }
 blockquote p:before {
   margin-right: 0.1em;
   content: '“';
   vertical-align: -0.4em;
-  color: var(--gray-50);
+  color: $color-grey-2;
   font-family: georgia, sans-serif;
   font-size: 3em;
   line-height: 0.1em;
@@ -192,7 +52,7 @@ blockquote p:after {
   margin-left: 0.1em;
   content: '”';
   vertical-align: -0.55em;
-  color: var(--gray-50);
+  color: $color-grey-2;
   font-family: georgia, sans-serif;
   font-size: 3em;
   line-height: 0.1em;
@@ -200,19 +60,19 @@ blockquote p:after {
 hr {
   clear: both;
   margin: 1rem 0;
-  border: 0.0625rem solid var(--primary-vivid-25);
+  border: 0.0625rem solid $color-1;
 }
 a {
   text-decoration: underline;
-  color: var(--primary);
+  color: $color-1;
 }
 a:hover {
   text-decoration: underline;
-  color: var(--primary-vivid);
+  color: $color-2;
 }
-a:visited {
-  color: var(--primary-darker);
-}
+// a:visited {
+//   color: $color-3;
+// }
 ul,
 ol {
   margin: 0 0 3.125rem 0;

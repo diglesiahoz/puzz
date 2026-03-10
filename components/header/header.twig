@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Header component.
+ */
+#}
+<div class="header">
+  {% if label_display|default('hidden') == 'above' and label_text|default('') is not empty %}
+    <div class="field__label">{{ label_text }}</div>
+  {% endif %}
+
+  {% if image_url is not empty %}
+    <div class="header__media">
+      <img src="{{ image_url }}" alt="{{ image_alt|default('') }}" class="header__image">
+    </div>
+  {% endif %}
+
+  {% if heading is not empty %}
+    <h1 class="header__caption">{{ heading }}</h1>
+  {% endif %}
+
+  {% if link_url is not empty %}
+    <div class="header__actions">
+      {% set component = 'puzz:cta' %}
+      {% set props = {
+        'text': link_title|default('More'),
+        'url': link_url,
+        'variant': 'primary',
+        'size': 'medium'
+      } %}
+      {{ {
+        '#type': 'component',
+        '#component': component ?? 'puzz:cta',
+        '#props': props
+      } }}
+    </div>
+  {% endif %}
+
+  {% if label_display|default('hidden') == 'below' and label_text|default('') is not empty %}
+    <div class="field__label">{{ label_text }}</div>
+  {% endif %}
+</div>
