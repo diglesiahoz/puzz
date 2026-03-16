@@ -4,12 +4,14 @@ default.xs:
   weight: 0
   multipliers:
     - 1x
+    - 2x
 default.sm:
   label: SM
   mediaQuery: '(min-width: 576px)'
   weight: 1
   multipliers:
     - 1x
+    - 2x
 default.md:
   label: MD
   mediaQuery: '(min-width: 768px)'

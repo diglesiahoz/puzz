@@ -17,13 +17,9 @@ props:
     heading:
       type: string
       title: Heading
-    image_url:
-      type: string
-      title: Image URL
-      format: uri
-    image_alt:
-      type: string
-      title: Image alt
+    image:
+      type: object
+      title: Rendered image
     link_url:
       type: string
       title: Link URL

@@ -9,9 +9,9 @@
     <div class="field__label">{{ label_text }}</div>
   {% endif %}
 
-  {% if image_url is not empty %}
+  {% if image is not empty %}
     <div class="header__media">
-      <img src="{{ image_url }}" alt="{{ image_alt|default('') }}" class="header__image">
+      {{ image }}
     </div>
   {% endif %}
 

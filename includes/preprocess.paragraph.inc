@@ -97,17 +97,15 @@ function _puzz_paragraph_header_component(array &$variables, ParagraphInterface 
     : '';
   $heading = $caption !== '' ? $caption : _puzz_get_current_page_title();
 
-  $image_url = '';
-  $image_alt = '';
+  $image = [];
   if ($paragraph->hasField('field_puzz_header_image') && !$paragraph->get('field_puzz_header_image')->isEmpty()) {
-    $media = $paragraph->get('field_puzz_header_image')->entity;
-    if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
-      $image_item = $media->get('field_media_image')->first();
-      if ($image_item && $image_item->entity) {
-        $file_url_generator = \Drupal::service('file_url_generator');
-        $image_url = (string) $file_url_generator->generateAbsoluteString($image_item->entity->getFileUri());
-        $image_alt = (string) ($image_item->alt ?? '');
-      }
+    // Renderizamos directamente la entidad Media en su view mode "puzz_header"
+    // para obtener el <picture> responsive sin el wrapper del field.
+    $item = $paragraph->get('field_puzz_header_image')->first();
+    if ($item && $item->entity) {
+      $media = $item->entity;
+      $media_view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
+      $image = $media_view_builder->view($media, 'puzz_header');
     }
   }
 
@@ -126,8 +124,7 @@ function _puzz_paragraph_header_component(array &$variables, ParagraphInterface 
   $variables['props'] = [
     'caption' => $caption,
     'heading' => $heading,
-    'image_url' => $image_url,
-    'image_alt' => $image_alt,
+    'image' => $image,
     'link_url' => $link_url,
     'link_title' => $link_title,
     'label_display' => 'hidden',

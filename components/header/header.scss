@@ -55,9 +55,39 @@
     position: absolute;
     inset: 0;
     z-index: 0;
+    display: flex;
+  }
+
+  // Hacemos que todo el árbol interno rellene el contenedor.
+  &__media > * {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__media article,
+  &__media .field,
+  &__media .field__item {
+    width: 100%;
+    height: 100%;
   }
 
   &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // Cuando la imagen viene de un <picture> generado por responsive_image,
+  // el <img> no lleva la clase .header__image. Forzamos el mismo comportamiento.
+  &__media picture,
+  &__media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  &__media picture img {
     width: 100%;
     height: 100%;
     object-fit: cover;
