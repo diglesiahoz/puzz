@@ -133,6 +133,7 @@
 
 #navbar-collapse {
   display: none;
+  height: $menu-height;
 
   body.menu-open & {
     overflow: hidden;
@@ -287,7 +288,7 @@
   // HEADER
   // ============================================================================
   #header {
-
+    height: $menu-height;
     //background: linear-gradient(0deg, $color-3, $color-black);
 
     body.menu-open & {
@@ -663,6 +664,13 @@
     background: #fff;
     color: inherit;
 
+    // Cuando el usuario está logado y la toolbar está fija,
+    // desplazamos el navbar por debajo de la barra de admin.
+    body.toolbar-fixed &,
+    body.toolbar-tray-open & {
+      top: $menu-admin-height; // altura aproximada de la toolbar horizontal
+    }
+
     body.menu-open & {
       overflow: visible;
       position: static;
@@ -822,9 +830,6 @@
               }
 
               > ul.menu {
-
-                --puzz-submenu-offset: 19rem;
-
                 position: fixed;
                 z-index: 1000;
                 top: 5.5rem; /* justo bajo el header (mismo valor que #header-wrapper height) */
@@ -839,11 +844,7 @@
                 justify-content: flex-start;
                 gap: 0;
                 height: auto;
-                /* Alineado con el ítem del menú (Page 1): mismo borde izquierdo que el enlace del menú */
-                //padding-left: var(--puzz-submenu-offset, 3.125rem);
-                //padding-right: 3.125rem;
-
-                padding: 1rem var(--puzz-submenu-offset);
+                padding: 1rem $menu-offset;
 
                 background: linear-gradient(90deg, $color-3, $color-black);
                 /* Puente invisible: cubre el hueco para no perder el hover al bajar el ratón */
@@ -856,15 +857,23 @@
                   height: 1rem;
                 }
 
-                /*@include mq('lg') {
-                  padding-left: var(--puzz-submenu-offset, calc((100vw - 50rem) / 2 + 16rem));
-                  padding-right: calc((100vw - 50rem) / 2);
+                // Cuando la toolbar de administración está visible, el header
+                // queda por debajo de ella. Ajustamos el dropdown para que
+                // también aparezca por debajo de la barra.
+                // Estado inicial (sin scroll): header en posición original, pero
+                // queremos que el dropdown arranque pegado al borde inferior
+                // del header visible (mismo offset vertical que en sticky).
+                body.toolbar-fixed:not(.puzz-header-scrolled) &,
+                body.toolbar-tray-open:not(.puzz-header-scrolled) & {
+                  top: calc(60px + $menu-admin-height + $menu-height); // alineado con altura real del header + toolbar
                 }
 
-                @include mq('xl') {
-                  padding-left: var(--puzz-submenu-offset, calc((100vw - 71.25rem) / 2 + 16rem));
-                  padding-right: calc((100vw - 71.25rem) / 2);
-                }*/
+                // Estado sticky (con scroll): el header ya está pegado arriba.
+                body.toolbar-fixed.puzz-header-scrolled &,
+                body.toolbar-tray-open.puzz-header-scrolled & {
+                  position: fixed;
+                  top: calc($menu-admin-height + $menu-height); // misma altura que el header sticky + toolbar
+                }
 
                 > li {
                   height: auto;
@@ -939,7 +948,7 @@
       overflow: visible;
       box-shadow: 0 0.1rem 0.8rem $color-3;
       //height: 100px;
-      height: auto;
+      //height: auto;
       display: flex;
       align-items: center;
 
@@ -1173,23 +1182,18 @@
 }
 
 // ============================================================================
-// NAVIGATION
+// NAVIGATION (solo para el menú principal del header)
 // ============================================================================
-nav {
+.dialog-off-canvas-main-canvas {
   ul {
-    display: flex;
     list-style: none;
     padding: 0;
     margin: 0;
-    align-items: center;
     height: 100%;
   }
-
   a {
-    padding: $spacing-sm $spacing-md;
     display: block;
     transition: $transition-1;
-
     &:hover,
     &:focus {
       color: $color-1;

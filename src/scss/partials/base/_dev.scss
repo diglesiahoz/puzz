@@ -35,7 +35,7 @@
           content: "#{str.to-upper-case($bp)} " attr(data-viewport);
           position: absolute;
           top: 0;
-          z-index: 99999;
+          z-index: 500;
           min-width: 8rem;
           text-align: center;
           font-size: 0.75rem;

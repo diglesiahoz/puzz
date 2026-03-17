@@ -142,6 +142,30 @@
     }
   };
 
+  // Marca en <body> cuándo el header ha pasado al estado "scrolled"
+  Drupal.behaviors.puzzHeaderScrollState = {
+    attach: function (context) {
+      const canvas = context.querySelector('.dialog-off-canvas-main-canvas');
+      if (!canvas) {
+        return;
+      }
+
+      const SCROLL_THRESHOLD = 10; // px desde la parte superior
+
+      const onScroll = () => {
+        if (window.scrollY > SCROLL_THRESHOLD) {
+          document.body.classList.add('puzz-header-scrolled');
+        } else {
+          document.body.classList.remove('puzz-header-scrolled');
+        }
+      };
+
+      // Estado inicial + listener
+      onScroll();
+      window.addEventListener('scroll', onScroll);
+    }
+  };
+
   // Development mode: Update viewport dimensions in breakpoint indicator
   Drupal.behaviors.devBreakpointIndicator = {
     attach: function (context) {

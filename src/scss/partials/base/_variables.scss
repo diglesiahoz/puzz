@@ -22,6 +22,11 @@ $color-grey-1: color-mix(in srgb, $color-black 25%, $color-white);
 $color-grey-2: color-mix(in srgb, $color-black 50%, $color-white);
 $color-grey-3: color-mix(in srgb, $color-black 75%, $color-white);
 
+// Menu
+$menu-admin-height: 60px;
+$menu-height: 90px;
+$menu-offset: 18rem;
+
 // Typography
 $font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 $font-family-heading: $font-family-base;
