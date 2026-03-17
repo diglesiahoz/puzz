@@ -177,10 +177,6 @@ footer {
 // ============================================================================
 @include mq('sm') {
   #footer {
-    .container {
-      padding: 0 2.5rem;
-    }
-
     .region-footer {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -197,10 +193,6 @@ footer {
 // ============================================================================
 @include mq('md') {
   #footer {
-    .container {
-      padding: 0 3.125rem;
-    }
-
     .region-footer {
       display: flex;
       gap: 2.5rem;
@@ -255,17 +247,6 @@ footer {
           }
         }
       }
-    }
-  }
-}
-
-// ============================================================================
-// BREAKPOINT: LG (Large devices)
-// ============================================================================
-@include mq('lg') {
-  #footer {
-    .container {
-      padding: 0;
     }
   }
 }

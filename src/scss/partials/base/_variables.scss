@@ -24,8 +24,23 @@ $color-grey-3: color-mix(in srgb, $color-black 75%, $color-white);
 
 // Menu
 $menu-admin-height: 60px;
-$menu-height: 90px;
-$menu-offset: 18rem;
+$menu-admin-height-mobile: 2rem;
+$menu-height: 6rem;
+
+// Container widths y offsets para alinear el submenú con el menú principal.
+// Estos valores deben ir coordinados con _layout.scss.
+$container-md-min: 45rem;
+$container-lg-min: 60rem;
+$container-xl-min: 75rem;
+
+// Offset lateral del submenú (relleno horizontal) por breakpoint.
+// Alinea el contenido del dropdown con el container centrado.
+$menu-offset-md: calc((100vw - $container-md-min) / 2);
+$menu-offset-lg: calc((100vw - $container-lg-min) / 2);
+$menu-offset-xl: calc((100vw - $container-xl-min) / 2);
+
+// Valor genérico de fallback (no se usa directamente en header, pero se mantiene por compatibilidad).
+$menu-offset: $menu-offset-md;
 
 // Typography
 $font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;

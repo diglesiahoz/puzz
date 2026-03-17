@@ -17,10 +17,14 @@
   margin: 0;
   padding: 0;
 
+  body.user-logged-in.puzz-header-scrolled & {
+    top: $menu-admin-height-mobile;
+  }
+
   #navbar {
     position: relative;
     z-index: 100;
-    height: 5.625rem;
+    height: $menu-height;
     margin: 0;
     padding: 0;
     background: #ffffff;
@@ -99,10 +103,6 @@
     }
 
     body.menu-open & {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      height: 5.625rem;
 
       .icon-menu {
         span.icon-menu-1 {
@@ -139,7 +139,7 @@
     overflow: hidden;
     position: fixed;
     z-index: 1000;
-    top: 5.625rem;
+    top: $menu-height;
     left: 0;
     display: flex;
     overflow-y: auto;
@@ -150,6 +150,12 @@
     padding-bottom: 3.125rem;
     color: #ffffff;
     background: $color-3;
+  }
+  body.menu-open.user-logged-in & {
+    top: calc(2rem + $menu-admin-height + $menu-height);
+  }
+  body.menu-open.user-logged-in.puzz-header-scrolled & {
+    top: calc($menu-admin-height-mobile + $menu-height);
   }
 
   // ============================================================================
@@ -664,12 +670,16 @@
     background: #fff;
     color: inherit;
 
+    body.user-logged-in.puzz-header-scrolled & {
+      top: $menu-admin-height-mobile;
+    }
+
     // Cuando el usuario está logado y la toolbar está fija,
     // desplazamos el navbar por debajo de la barra de admin.
-    body.toolbar-fixed &,
-    body.toolbar-tray-open & {
-      top: $menu-admin-height; // altura aproximada de la toolbar horizontal
-    }
+    //body.toolbar-fixed &,
+    //body.toolbar-tray-open & {
+    //  top: $menu-admin-height; // altura aproximada de la toolbar horizontal
+    //}
 
     body.menu-open & {
       overflow: visible;
@@ -829,10 +839,10 @@
                 //background-color: $color-black;
               }
 
-              > ul.menu {
+                > ul.menu {
                 position: fixed;
                 z-index: 1000;
-                top: 5.5rem; /* justo bajo el header (mismo valor que #header-wrapper height) */
+                top: $menu-height;
                 left: 0;
                 right: 0;
                 width: 100%;
@@ -844,9 +854,10 @@
                 justify-content: flex-start;
                 gap: 0;
                 height: auto;
-                padding: 1rem $menu-offset;
-
+                // Offset lateral del submenú: alineado con el container.
+                padding: 1rem $menu-offset-md;
                 background: linear-gradient(90deg, $color-3, $color-black);
+                
                 /* Puente invisible: cubre el hueco para no perder el hover al bajar el ratón */
                 &::before {
                   content: '';
@@ -865,7 +876,7 @@
                 // del header visible (mismo offset vertical que en sticky).
                 body.toolbar-fixed:not(.puzz-header-scrolled) &,
                 body.toolbar-tray-open:not(.puzz-header-scrolled) & {
-                  top: calc(60px + $menu-admin-height + $menu-height); // alineado con altura real del header + toolbar
+                  top: calc(25px + $menu-admin-height + $menu-height); // alineado con altura real del header + toolbar en md
                 }
 
                 // Estado sticky (con scroll): el header ya está pegado arriba.
@@ -978,9 +989,10 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        min-height: 5.5rem;
-        height: 5.5rem;
+        //min-height: 5.5rem;
+        //height: 5.5rem;
         overflow: visible;
+        height: 100%;
       }
 
       .region-header {
@@ -998,12 +1010,12 @@
           a.logo {
             display: flex;
             align-items: center;
-            padding: 2.375rem 0;
+            padding: 0;
             text-decoration: none;
 
             .image {
               display: block;
-              padding-right: 1.125rem;
+              padding-right: 1rem;
 
               img {
                 width: auto;
@@ -1174,6 +1186,62 @@
         .block-search {
           .form-search {
             width: 13.75rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// BREAKPOINT: LG
+// ============================================================================
+@include mq('lg') {
+  // Offset lateral del submenú alineado con container en LG.
+  #navbar-collapse {
+    #menu {
+      .block-menu {
+        ul.menu {
+          > li {
+            &:hover {
+              > ul.menu {
+                padding: 1rem $menu-offset-lg;
+
+                // En LG, con toolbar visible y sin scroll, el dropdown
+                // debe bajar algo más (60px extra) para alinearse visualmente.
+                body.toolbar-fixed:not(.puzz-header-scrolled) &,
+                body.toolbar-tray-open:not(.puzz-header-scrolled) & {
+                  top: calc(60px + $menu-admin-height + $menu-height);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Ajuste extra cuando el header está en estado scrolled y el usuario logado.
+    body.user-logged-in.puzz-header-scrolled & {
+      top: $menu-admin-height;
+    }
+  }
+}
+
+// ============================================================================
+// BREAKPOINT: XL
+// ============================================================================
+@include mq('xl') {
+  // Offset lateral del submenú alineado con container en LG.
+  #navbar-collapse {
+    #menu {
+      .block-menu {
+        ul.menu {
+          > li {
+            &:hover {
+              > ul.menu {
+                padding: 1rem $menu-offset-xl;
+              }
+            }
           }
         }
       }

@@ -29,7 +29,7 @@
 
     @each $bp, $color in $dialog-breakpoints {
       @include mq($bp) {
-        border: 2px dotted $color;
+        //border: 2px dotted $color;
 
         &::before {
           content: "#{str.to-upper-case($bp)} " attr(data-viewport);
@@ -45,11 +45,21 @@
           background: $color;
           white-space: nowrap;
         }
+
+        // Cuando el header ha pasado al estado "scrolled", fijamos también
+        // el indicador de breakpoint en la parte superior de la ventana,
+        // manteniendo el resto de estilos.
+        // body.puzz-header-scrolled &::before {
+        //   position: fixed;
+        //   top: 0;
+        //   left: 0;
+        //   right: auto;
+        // }
       }
     }
   }
 
-  .region {
-    //border: 1px dotted $color-1;
+  .region:not(.region-navbar) {
+    border: 1px dotted $color-1;
   }
 }

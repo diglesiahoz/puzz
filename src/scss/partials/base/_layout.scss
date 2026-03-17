@@ -17,7 +17,7 @@
 // ============================================================================
 body:not(.page-node-type-puzz-landing) {
   .container {
-    padding: 0 1.875rem;
+    padding: 0 2rem;
   }
 }
 
@@ -34,7 +34,10 @@ body.page-node-type-puzz-landing {
 // ============================================================================
 @include mq('md') {
   .container {
-    //padding: 0 3.125rem; // 50px
+    margin: 0 auto;
+    padding: 0;
+    height: 100%;
+    min-width: $container-md-min;
   }
 }
 
@@ -43,10 +46,8 @@ body.page-node-type-puzz-landing {
 // ============================================================================
 @include mq('lg') {
   .container {
-    width: 59%;
-    min-width: 50rem; // 1140px
-    margin: 0 auto;
-    padding: 0;
+    min-width: $container-lg-min;
+    width: $container-lg-min;
   }
 }
 
@@ -55,7 +56,8 @@ body.page-node-type-puzz-landing {
 // ============================================================================
 @include mq('xl') {
   .container {
-    min-width: 71.25rem; // 1140px
+    min-width: $container-xl-min;
+    width: $container-xl-min;
   }
 }
 

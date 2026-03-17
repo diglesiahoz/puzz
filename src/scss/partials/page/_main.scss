@@ -17,6 +17,11 @@
   .region-center {
     display: flex;
     flex-direction: column;
+    
+    body:not(.page-node-type-puzz-landing) & {
+      padding: 0 0 2rem 0;
+      
+    }
 
     #main {
       order: 1;
