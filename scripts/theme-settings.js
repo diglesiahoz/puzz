@@ -313,18 +313,11 @@
       }
 
       function renderIconPreview(rawName) {
-        const customIconsBasePath = (window.drupalSettings && window.drupalSettings.puzz && window.drupalSettings.puzz.icons && window.drupalSettings.puzz.icons.customIconsBasePath)
-          ? window.drupalSettings.puzz.icons.customIconsBasePath
+        const adminPreviewSpritePath = (window.drupalSettings && window.drupalSettings.puzz && window.drupalSettings.puzz.icons && window.drupalSettings.puzz.icons.adminPreviewSpritePath)
+          ? window.drupalSettings.puzz.icons.adminPreviewSpritePath
           : '';
-        if (rawName.startsWith('custom-') && customIconsBasePath) {
-          return `<img src="${customIconsBasePath}/${escapeHtml(rawName)}.svg" alt="" loading="lazy" decoding="async">`;
-        }
-
-        const tablerBasePath = (window.drupalSettings && window.drupalSettings.puzz && window.drupalSettings.puzz.icons && window.drupalSettings.puzz.icons.tablerBasePath)
-          ? window.drupalSettings.puzz.icons.tablerBasePath
-          : '';
-        if (tablerBasePath) {
-          return `<img src="${tablerBasePath}/${escapeHtml(rawName)}.svg" alt="" loading="lazy" decoding="async">`;
+        if (adminPreviewSpritePath) {
+          return `<svg class="icon icon--sm"><use href="${adminPreviewSpritePath}#icon-${escapeHtml(rawName)}"></use></svg>`;
         }
         return '';
       }

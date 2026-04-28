@@ -28,7 +28,7 @@ const buildDir = join(themeRoot, 'build');
 const buildCssDir = join(buildDir, 'css');
 const buildJsDir = join(buildDir, 'js');
 const buildComponentsDir = join(buildDir, 'components');
-const srcIconsDir = join(srcDir, 'icons');
+const srcIconsDir = join(srcDir, 'assets', 'icons');
 const srcCustomIconsDir = join(srcIconsDir, 'custom');
 const buildIconsDir = join(buildDir, 'assets', 'icons');
 
@@ -157,39 +157,31 @@ async function copyGlobalJS(silent = false) {
 }
 
 /**
- * Copy assets from src/assets to build/assets.
+ * Copy fonts from src/assets/fonts to build/assets/fonts.
  */
 async function copyAssets(silent = false) {
   const srcAssetsDir = join(srcDir, 'assets');
   const buildAssetsDir = join(buildDir, 'assets');
+  const srcFontsDir = join(srcAssetsDir, 'fonts');
+  const buildFontsDir = join(buildAssetsDir, 'fonts');
 
   try {
     const fs = await import('fs/promises');
-    try { await stat(srcAssetsDir); } catch { return; }
+    try { await stat(srcFontsDir); } catch { return; }
     await fs.mkdir(buildAssetsDir, { recursive: true });
-    const entries = await fs.readdir(srcAssetsDir, { withFileTypes: true });
-    for (const entry of entries) {
-      const srcPath = join(srcAssetsDir, entry.name);
-      const buildPath = join(buildAssetsDir, entry.name);
-      if (entry.isDirectory()) {
-        await fs.cp(srcPath, buildPath, { recursive: true });
-        const setPermissions = async dir => {
-          chmodSync(dir, 0o755);
-          const files = await fs.readdir(dir, { withFileTypes: true });
-          for (const file of files) {
-            const filePath = join(dir, file.name);
-            if (file.isDirectory()) await setPermissions(filePath);
-            else chmodSync(filePath, 0o644);
-          }
-        };
-        await setPermissions(buildPath);
-      } else {
-        await fs.copyFile(srcPath, buildPath);
-        chmodSync(buildPath, 0o644);
+    await fs.cp(srcFontsDir, buildFontsDir, { recursive: true });
+    const setPermissions = async dir => {
+      chmodSync(dir, 0o755);
+      const files = await fs.readdir(dir, { withFileTypes: true });
+      for (const file of files) {
+        const filePath = join(dir, file.name);
+        if (file.isDirectory()) await setPermissions(filePath);
+        else chmodSync(filePath, 0o644);
       }
-    }
+    };
+    await setPermissions(buildFontsDir);
     chmodSync(buildAssetsDir, 0o755);
-    //if (!silent) console.log(`✓ Copied ... assets`);
+    //if (!silent) console.log(`✓ Copied ... assets/fonts`);
   } catch (error) {
     if (error.code !== 'ENOENT' && !silent) console.error(`✗ Error copying assets:`, error.message);
   }

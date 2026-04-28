@@ -77,7 +77,7 @@ npm run dev         # Servidor de desarrollo con hot reload
 El tema usa una única estrategia Drupal-friendly basada en **sprite SVG compilado**:
 
 - **Fuente base:** `@tabler/icons` (outline, libre y extensa)
-- **Fuente custom:** `src/icons/custom/*.svg`
+- **Fuente custom:** `src/assets/icons/custom/*.svg`
 - **Sprite frontend:** `build/assets/icons/sprite.svg`
 - **Sprite preview admin:** `build/assets/icons/admin-preview-sprite.svg`
 
@@ -93,12 +93,12 @@ Regla de compilación para custom:
 - Si no empieza por `custom-`, el build añade ese prefijo.
 
 Ejemplo real:
-- Archivo: `src/icons/custom/custom-demo-puzz.svg`
+- Archivo: `src/assets/icons/custom/custom-demo-puzz.svg`
 - Símbolo resultante en sprite: `icon-custom-demo-puzz`
 
 ### Flujo completo (recomendado)
 
-1. Añade o modifica SVG en `src/icons/custom/`.
+1. Añade o modifica SVG en `src/assets/icons/custom/`.
 2. Compila el tema (`build:dev` para desarrollo, `build:prod` para producción).
 3. Limpia caché Drupal si no ves cambios inmediatos.
 4. Usa el icono en Twig por nombre de símbolo.
@@ -110,7 +110,7 @@ Comandos típicos:
 npm --prefix drupal/web/themes/custom/puzz run build:dev
 
 # En contenedor (ejemplo de este proyecto)
-docker exec -i --user diglesia demo-www npm --prefix /opt/demo/drupal/web/themes/custom/puzz run build:dev -v
+docker exec -i --user diglesia demo-www npm --prefix /opt/demo/drupal/web/themes/custom/puzz run build:dev
 docker exec -i --user diglesia demo-www /opt/demo/drupal/vendor/bin/drush cr
 ```
 
@@ -131,14 +131,13 @@ Opciones disponibles:
 
 Notas importantes:
 
-- Los **custom icons** se incluyen siempre en el sprite frontend.
-- La selección visual afecta a iconos Tabler (no excluye custom).
+- La selección visual afecta a iconos Tabler y custom.
 
 Al guardar settings, se genera:
 
 - `public://puzz.icons.json` (normalmente `sites/default/files/puzz.icons.json`)
 
-El script `scripts/build.js` usa ese JSON para decidir qué Tabler incluir en `sprite.svg`.
+El script `scripts/build.js` usa ese JSON para decidir qué iconos (Tabler y custom) incluir en `sprite.svg`.
 
 ### Uso en Twig (helper oficial)
 
@@ -163,9 +162,11 @@ Helper: `templates/includes/icon.twig`
 
 ```twig
 <svg class="icon icon--md" aria-hidden="true">
-  <use href="{{ base_path ~ active_theme_path() }}/build/assets/icons/sprite.svg#icon-custom-demo-puzz"></use>
+  <use href="#icon-custom-demo-puzz"></use>
 </svg>
 ```
+
+Nota: el sprite se inyecta inline en el DOM (`page_top`), por eso no verás una petición de red separada a `sprite.svg` al renderizar iconos.
 
 ### Estilos base de icono
 
@@ -189,7 +190,7 @@ El build optimiza SVG con `svgo` y normaliza atributos para consistencia visual.
 
 Si un icono no aparece:
 
-1. Verifica que existe el archivo en `src/icons/custom/`.
+1. Verifica que existe el archivo en `src/assets/icons/custom/`.
 2. Recompila tema.
 3. Verifica que existe `build/assets/icons/sprite.svg`.
 4. Limpia caché (`drush cr`).

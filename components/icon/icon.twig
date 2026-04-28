@@ -8,33 +8,21 @@
 {% set icon_name = name|default('')|trim %}
 {% if icon_name %}
   {% set icon_size = size|default('md') %}
-  {% set icon_source = source|default('sprite') %}
   {% set classes = ['icon', 'icon--' ~ icon_size] %}
   {% if class is defined and class %}
     {% set classes = classes|merge([class]) %}
   {% endif %}
   {% set icon_color = (color is defined and color) ? color : '#000000' %}
-  {% set raw_name = icon_name|replace({'icon-': ''}) %}
-
-  {% if icon_source == 'sprite' %}
-    <svg
-      class="{{ classes|join(' ') }}"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      style="color: {{ icon_color|e('html_attr') }};"
-      {% if label is defined and label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}
-    >
-      <use href="#{{ icon_name }}" xlink:href="#{{ icon_name }}"></use>
-    </svg>
-  {% else %}
-    {% set file_path = raw_name starts with 'custom-' ? '/' ~ active_theme_path() ~ '/src/icons/custom/' ~ raw_name ~ '.svg' : '/' ~ active_theme_path() ~ '/node_modules/@tabler/icons/icons/outline/' ~ raw_name ~ '.svg' %}
-    <span
-      class="{{ classes|join(' ') }} icon--mask"
-      style="--icon-url: url('{{ file_path|e('html_attr') }}'); --icon-color: {{ icon_color|e('html_attr') }};"
-      {% if label is defined and label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}
-    ></span>
-  {% endif %}
+  <svg
+    class="{{ classes|join(' ') }}"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    style="color: {{ icon_color|e('html_attr') }};"
+    {% if label is defined and label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}
+  >
+    <use href="#{{ icon_name }}" xlink:href="#{{ icon_name }}"></use>
+  </svg>
 {% endif %}

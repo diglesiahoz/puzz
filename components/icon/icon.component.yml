@@ -44,14 +44,3 @@ props:
       examples:
         - '#0ea5e9'
         - 'var(--color-1)'
-    source:
-      type: string
-      title: Render source
-      description: sprite uses compiled sprite symbol (recommended). file loads direct SVG file.
-      enum:
-        - file
-        - sprite
-      default: sprite
-      examples:
-        - sprite
-        - file

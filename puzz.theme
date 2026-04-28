@@ -369,7 +369,7 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
     '#type' => 'details',
     '#title' => t('Icons'),
     '#open' => FALSE,
-    '#description' => t('Configure Tabler icon inclusion for the generated sprite. Custom icons from src/icons/custom are always included.'),
+    '#description' => t('Configure icon inclusion for the generated sprite (Tabler + custom from src/assets/icons/custom).'),
     '#group' => 'styles',
   ];
 
@@ -441,15 +441,13 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
     '#title' => t('Icons available in sprite'),
     '#default_value' => $icons_selected,
     '#options' => $icon_options,
-    '#description' => t('Naming convention in Twig: icon-{name}. Example: icon-search or icon-custom-demo-puzz. Custom icons are always included in the final sprite.'),
+    '#description' => t('Naming convention in Twig: icon-{name}. Example: icon-search or icon-custom-demo-puzz. Only selected icons are included in the final sprite.'),
     '#attributes' => [],
   ];
 
   $form['#attached']['drupalSettings']['puzz']['icons'] = [
     'spritePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/build/assets/icons/sprite.svg',
     'adminPreviewSpritePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/build/assets/icons/admin-preview-sprite.svg',
-    'tablerBasePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/node_modules/@tabler/icons/icons/outline',
-    'customIconsBasePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/src/icons/custom',
   ];
 
   // Submit handler to process resets
@@ -814,11 +812,11 @@ function puzz_get_tabler_icon_names(): array {
 }
 
 /**
- * Returns custom icon names from src/icons/custom (without "icon-" prefix).
+ * Returns custom icon names from src/assets/icons/custom (without "icon-" prefix).
  */
 function puzz_get_custom_icon_names(): array {
   $theme_root = _puzz_theme_root();
-  $icons_dir = $theme_root . '/src/icons/custom';
+  $icons_dir = $theme_root . '/src/assets/icons/custom';
   if (!is_dir($icons_dir) || !is_readable($icons_dir)) {
     return [];
   }
