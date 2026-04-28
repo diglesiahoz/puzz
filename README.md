@@ -72,6 +72,135 @@ npm run dev         # Servidor de desarrollo con hot reload
 - `npm run dev` - Inicia servidor de desarrollo con hot reload (BrowserSync, usa modo dev automáticamente)
 - `npm run clean` - Limpia el directorio `build/`
 
+## 🔤 Sistema de Iconos (Tabler + Custom)
+
+El tema usa una única estrategia Drupal-friendly basada en **sprite SVG compilado**:
+
+- **Fuente base:** `@tabler/icons` (outline, libre y extensa)
+- **Fuente custom:** `src/icons/custom/*.svg`
+- **Sprite frontend:** `build/assets/icons/sprite.svg`
+- **Sprite preview admin:** `build/assets/icons/admin-preview-sprite.svg`
+
+### Convención de nombres (obligatoria)
+
+- **Tabler:** `icon-{nombre}`
+  - Ejemplos: `icon-search`, `icon-user`, `icon-chevron-right`
+- **Custom:** `icon-custom-{nombre}`
+  - Ejemplos: `icon-custom-whatsapp`, `icon-custom-demo-puzz`
+
+Regla de compilación para custom:
+- Si el archivo ya empieza por `custom-`, se mantiene.
+- Si no empieza por `custom-`, el build añade ese prefijo.
+
+Ejemplo real:
+- Archivo: `src/icons/custom/custom-demo-puzz.svg`
+- Símbolo resultante en sprite: `icon-custom-demo-puzz`
+
+### Flujo completo (recomendado)
+
+1. Añade o modifica SVG en `src/icons/custom/`.
+2. Compila el tema (`build:dev` para desarrollo, `build:prod` para producción).
+3. Limpia caché Drupal si no ves cambios inmediatos.
+4. Usa el icono en Twig por nombre de símbolo.
+
+Comandos típicos:
+
+```bash
+# Local
+npm --prefix drupal/web/themes/custom/puzz run build:dev
+
+# En contenedor (ejemplo de este proyecto)
+docker exec -i --user diglesia demo-www npm --prefix /opt/demo/drupal/web/themes/custom/puzz run build:dev -v
+docker exec -i --user diglesia demo-www /opt/demo/drupal/vendor/bin/drush cr
+```
+
+### Selector visual en settings del tema
+
+Ruta: `/admin/appearance/settings/puzz` -> **Styles** -> **Icons**
+
+Opciones disponibles:
+
+- **Include all Tabler icons**
+  - Incluye todos los Tabler (warning de rendimiento por tamaño del sprite).
+- **Selección manual**
+  - Búsqueda en tiempo real.
+  - Preview visual del icono.
+  - Paginación.
+  - Toggle **Show selected** para filtrar solo seleccionados.
+  - Listado de seleccionados en la parte superior.
+
+Notas importantes:
+
+- Los **custom icons** se incluyen siempre en el sprite frontend.
+- La selección visual afecta a iconos Tabler (no excluye custom).
+
+Al guardar settings, se genera:
+
+- `public://puzz.icons.json` (normalmente `sites/default/files/puzz.icons.json`)
+
+El script `scripts/build.js` usa ese JSON para decidir qué Tabler incluir en `sprite.svg`.
+
+### Uso en Twig (helper oficial)
+
+Helper: `templates/includes/icon.twig`
+
+```twig
+{# Decorativo (aria-hidden) #}
+{% include '@puzz/includes/icon.twig' with {
+  name: 'icon-search',
+  class: 'icon--md'
+} only %}
+
+{# Accesible con etiqueta #}
+{% include '@puzz/includes/icon.twig' with {
+  name: 'icon-custom-demo-puzz',
+  class: 'icon--lg',
+  label: 'Icono demo Puzz'
+} only %}
+```
+
+### Uso directo sin helper (opcional)
+
+```twig
+<svg class="icon icon--md" aria-hidden="true">
+  <use href="{{ base_path ~ active_theme_path() }}/build/assets/icons/sprite.svg#icon-custom-demo-puzz"></use>
+</svg>
+```
+
+### Estilos base de icono
+
+Definidos en `src/scss/partials/base/_icons.scss` e importados desde `main.scss`:
+
+- `.icon` (base)
+- `.icon--xs`, `.icon--sm`, `.icon--md`, `.icon--lg`, `.icon--xl`
+
+### Requisitos del SVG custom
+
+Para mejor resultado en sprite:
+
+- Usa `viewBox` (preferible `0 0 24 24`).
+- Evita `width`/`height` fijos (el build limpia dimensiones).
+- Evita estilos embebidos complejos.
+- Trazo simple y geometría limpia.
+
+El build optimiza SVG con `svgo` y normaliza atributos para consistencia visual.
+
+### Troubleshooting rápido de iconos
+
+Si un icono no aparece:
+
+1. Verifica que existe el archivo en `src/icons/custom/`.
+2. Recompila tema.
+3. Verifica que existe `build/assets/icons/sprite.svg`.
+4. Limpia caché (`drush cr`).
+5. Confirma que el nombre usado en Twig coincide exactamente con el símbolo.
+
+Comprobación útil:
+
+```bash
+rg "icon-custom-demo-puzz" drupal/web/themes/custom/puzz/build/assets/icons/sprite.svg
+```
+
 ### Modos de Compilación
 
 **Modo Desarrollo (`build:dev`):**

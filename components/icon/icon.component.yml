@@ -1,0 +1,57 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Icon
+description: SVG icon rendered from the compiled theme sprite.
+group: Base
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Icon symbol id
+      description: Symbol id in sprite, e.g. icon-search or icon-custom-demo-puzz.
+      examples:
+        - icon-search
+        - icon-custom-demo-puzz
+    size:
+      type: string
+      title: Icon size modifier
+      description: Size class suffix mapped to icon--{size}.
+      enum:
+        - xs
+        - sm
+        - md
+        - lg
+        - xl
+      default: md
+      examples:
+        - md
+    class:
+      type: string
+      title: Extra classes
+      description: Extra CSS classes to append to icon element.
+      examples:
+        - u-text-primary
+    label:
+      type: string
+      title: Accessible label
+      description: If empty, icon is treated as decorative.
+      examples:
+        - Search
+    color:
+      type: string
+      title: Inline color
+      description: Optional CSS color value for quick visual testing.
+      examples:
+        - '#0ea5e9'
+        - 'var(--color-1)'
+    source:
+      type: string
+      title: Render source
+      description: file loads direct SVG file (recommended). sprite uses compiled sprite symbol.
+      enum:
+        - file
+        - sprite
+      default: file
+      examples:
+        - file
+        - sprite

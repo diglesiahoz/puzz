@@ -14,6 +14,8 @@ import { execSync } from 'child_process';
 import * as sass from 'sass';
 import fg from 'fast-glob';
 import { tmpdir } from 'os';
+import svgstore from 'svgstore';
+import { optimize } from 'svgo';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,6 +28,9 @@ const buildDir = join(themeRoot, 'build');
 const buildCssDir = join(buildDir, 'css');
 const buildJsDir = join(buildDir, 'js');
 const buildComponentsDir = join(buildDir, 'components');
+const srcIconsDir = join(srcDir, 'icons');
+const srcCustomIconsDir = join(srcIconsDir, 'custom');
+const buildIconsDir = join(buildDir, 'assets', 'icons');
 
 /**
  * Fix source map paths: convert absolute file:// paths to relative paths.
@@ -498,6 +503,147 @@ async function generateBreakpoints(silent = false) {
 }
 
 /**
+ * Build SVG sprite from Tabler icons + custom icons.
+ *
+ * Naming convention:
+ * - Tabler icons: icon-{name}
+ * - Custom icons: icon-custom-{name}
+ */
+async function buildIconSprite(silent = false) {
+  const tablerOutlinePattern = join(themeRoot, 'node_modules', '@tabler', 'icons', 'icons', 'outline', '*.svg').replace(/\\/g, '/');
+  const customIconsPattern = join(srcCustomIconsDir, '*.svg').replace(/\\/g, '/');
+  const tablerFiles = await fg(tablerOutlinePattern, { onlyFiles: true, absolute: true });
+  const customFiles = await fg(customIconsPattern, { onlyFiles: true, absolute: true });
+  const iconSettingsPath = join(themeRoot, '..', '..', '..', 'sites', 'default', 'files', 'puzz.icons.json');
+  let includeAll = true;
+  let selectedIcons = new Set();
+
+  try {
+    const payload = JSON.parse(readFileSync(iconSettingsPath, 'utf-8'));
+    includeAll = !!payload.include_all;
+    if (Array.isArray(payload.selected)) {
+      selectedIcons = new Set(
+        payload.selected
+          .map(name => String(name).replace(/^icon-/, '').trim().toLowerCase())
+          .filter(Boolean)
+      );
+    }
+  } catch (error) {
+    // No selection file yet: default behavior is include all.
+  }
+
+  if (!tablerFiles.length && !customFiles.length) {
+    if (!silent) console.warn('⚠ No SVG icons found for sprite generation.');
+    return;
+  }
+
+  await mkdir(buildIconsDir, { recursive: true });
+  const sprite = svgstore({ inline: true });
+  const previewSprite = svgstore({ inline: true });
+  let added = 0;
+  let previewAdded = 0;
+
+  const sanitizeName = name => name
+    .toLowerCase()
+    .replace(/^icon-/, '')
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-|-$/g, '');
+
+  const extractSvgInner = (svgRaw, filePath) => {
+    const optimized = optimize(svgRaw, {
+      path: filePath,
+      multipass: true,
+      plugins: [
+        'removeXMLNS',
+        'removeDimensions',
+      ],
+    });
+
+    if (optimized.error) {
+      throw new Error(`SVGO error in ${filePath}: ${optimized.error}`);
+    }
+
+    const svg = optimized.data;
+    const viewBoxMatch = svg.match(/viewBox="([^"]+)"/i);
+    const innerMatch = svg.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
+    if (!innerMatch) {
+      throw new Error(`Invalid SVG format: ${filePath}`);
+    }
+    return {
+      viewBox: viewBoxMatch ? viewBoxMatch[1] : '0 0 24 24',
+      inner: innerMatch[1],
+    };
+  };
+
+  for (const filePath of tablerFiles) {
+    const baseName = sanitizeName(pathDirname(filePath) ? filePath.split('/').pop().replace(/\.svg$/i, '') : '');
+    if (!baseName) continue;
+    const symbolId = `icon-${baseName}`;
+    try {
+      const svgRaw = await readFile(filePath, 'utf-8');
+      const { viewBox, inner } = extractSvgInner(svgRaw, filePath);
+      const tablerSymbol = `<svg viewBox="${viewBox}"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+      previewSprite.add(symbolId, tablerSymbol);
+      previewAdded++;
+      if (!includeAll && !selectedIcons.has(baseName)) {
+        continue;
+      }
+      sprite.add(symbolId, tablerSymbol);
+      added++;
+    } catch (error) {
+      if (!silent) console.warn(`⚠ Skipped invalid icon ${filePath}: ${error.message}`);
+    }
+  }
+
+  for (const filePath of customFiles) {
+    const fileName = sanitizeName(filePath.split('/').pop().replace(/\.svg$/i, ''));
+    if (!fileName) continue;
+    const customName = fileName.startsWith('custom-') ? fileName : `custom-${fileName}`;
+    const symbolId = `icon-${customName}`;
+    try {
+      const svgRaw = await readFile(filePath, 'utf-8');
+      const { viewBox, inner } = extractSvgInner(svgRaw, filePath);
+      previewSprite.add(symbolId, `<svg viewBox="${viewBox}">${inner}</svg>`);
+      previewAdded++;
+      // Custom icons are included in frontend sprite only when selected.
+      if (selectedIcons.has(customName)) {
+        sprite.add(symbolId, `<svg viewBox="${viewBox}">${inner}</svg>`);
+        added++;
+      }
+    } catch (error) {
+      if (!silent) console.warn(`⚠ Skipped invalid custom icon ${filePath}: ${error.message}`);
+    }
+  }
+
+  if (!previewAdded) {
+    if (!silent) console.warn('⚠ Icon preview sprite not generated: no valid SVG icons.');
+    return;
+  }
+
+  const previewSpriteContent = previewSprite.toString({ inline: true });
+  const previewSpriteFile = join(buildIconsDir, 'admin-preview-sprite.svg');
+  writeFileSync(previewSpriteFile, previewSpriteContent, 'utf-8');
+  chmodSync(previewSpriteFile, 0o644);
+
+  if (!added) {
+    if (!silent) console.warn('⚠ Icon sprite not generated: no selected icons.');
+    return;
+  }
+
+  const spriteContent = sprite.toString({ inline: true });
+  const spriteFile = join(buildIconsDir, 'sprite.svg');
+  writeFileSync(spriteFile, spriteContent, 'utf-8');
+  chmodSync(spriteFile, 0o644);
+  chmodSync(buildIconsDir, 0o755);
+  if (!silent) {
+    const modeLabel = includeAll ? 'all tabler icons' : `selected tabler icons (${selectedIcons.size})`;
+    console.log(`✓ Built ... assets/icons/admin-preview-sprite.svg (${previewAdded} icons)`);
+    console.log(`✓ Built ... assets/icons/sprite.svg (${added} icons, ${modeLabel})`);
+  }
+}
+
+/**
  * Get all component directories
  */
 async function getComponents() {
@@ -535,6 +681,7 @@ async function build(silent = false, mode = 'dev') {
     totalSourceMaps += await buildGlobalCSS(silent, mode);
     await copyGlobalJS(silent);
     await copyAssets(silent);
+    await buildIconSprite(silent);
 
     const components = await getComponents();
     for (const component of components) {

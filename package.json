@@ -15,10 +15,19 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^5.0.1",
+    "@storybook/addon-a11y": "^10.2.10",
+    "@storybook/addon-docs": "^10.2.10",
+    "@storybook/addon-vitest": "^10.2.10",
+    "@storybook/html-vite": "^10.2.10",
+    "@tabler/icons": "^3.41.1",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.20",
     "browser-sync": "^3.0.4",
     "chokidar": "^3.6.0",
     "fast-glob": "^3.3.3",
+    "playwright": "^1.58.2",
     "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",
     "postcss-sorting": "^8.0.2",
@@ -26,15 +35,9 @@
     "rimraf": "^5.0.5",
     "sass": "^1.77.8",
     "storybook": "^10.2.10",
-    "@storybook/html-vite": "^10.2.10",
-    "@chromatic-com/storybook": "^5.0.1",
-    "@storybook/addon-vitest": "^10.2.10",
-    "@storybook/addon-a11y": "^10.2.10",
-    "@storybook/addon-docs": "^10.2.10",
-    "vitest": "^4.0.18",
-    "playwright": "^1.58.2",
-    "@vitest/browser-playwright": "^4.0.18",
-    "@vitest/coverage-v8": "^4.0.18"
+    "svgo": "^4.0.1",
+    "svgstore": "^3.0.1",
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=18.0.0"

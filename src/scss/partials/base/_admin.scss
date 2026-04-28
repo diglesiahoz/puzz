@@ -55,3 +55,176 @@
     margin-top: 0.5rem;
   }
 }
+
+.puzz-icons-grid {
+  max-block-size: none;
+  overflow: visible;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background-color: #fff;
+}
+
+.puzz-icons-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.75rem;
+  align-items: center;
+}
+
+.puzz-icons-actions .button {
+  min-block-size: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.65rem;
+}
+
+.puzz-icons-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+
+.puzz-icons-pagination .js-puzz-icons-page-info {
+  font-size: 0.82rem;
+  color: #374151;
+}
+
+.puzz-icons-grid .form-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+  max-block-size: min(70vh, 42rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.35rem;
+}
+
+.puzz-icons-grid .form-item.js-form-type-checkbox,
+.puzz-icons-grid .form-type-checkbox {
+  margin: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 0.5rem 0.65rem;
+  min-block-size: 2.9rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.puzz-icons-grid .form-item.js-form-type-checkbox:hover,
+.puzz-icons-grid .form-type-checkbox:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.puzz-icons-grid .form-item.js-form-type-checkbox input[type='checkbox'],
+.puzz-icons-grid .form-type-checkbox input[type='checkbox'] {
+  margin: 0;
+  margin-top: 0 !important;
+  align-self: center !important;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  flex: 0 0 1.5rem;
+}
+
+.puzz-icons-grid .form-item.js-form-type-checkbox .form-item__label,
+.puzz-icon-option-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  word-break: break-word;
+  margin: 0 !important;
+  width: 100%;
+  min-width: 0;
+  cursor: copy;
+}
+
+.puzz-icon-option-preview {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111827;
+  flex: 0 0 2.5rem;
+}
+
+.puzz-icon-option-preview img {
+  inline-size: 2rem;
+  block-size: 2rem;
+  display: block;
+}
+
+.puzz-icon-option-preview .icon {
+  inline-size: 2rem;
+  block-size: 2rem;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+
+.puzz-icons-selection-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.puzz-icons-selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.puzz-icons-empty {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.puzz-icons-filter-info {
+  margin: 0.25rem 0 0.5rem;
+  color: #4b5563;
+  font-size: 0.78rem;
+}
+
+.puzz-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #f9fafb;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: #111827;
+  cursor: copy;
+}
+
+.puzz-copy-feedback {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 0.35rem;
+  font-size: 0.72rem;
+  color: #047857;
+  font-weight: 600;
+}
+
+.puzz-icon-chip__preview {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 0.9rem;
+}
+
+.puzz-icon-chip__preview img,
+.puzz-icon-chip__preview .icon {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  display: block;
+}

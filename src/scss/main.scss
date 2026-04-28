@@ -23,17 +23,20 @@
 // 6. Elements: Reset and base styles
 @use 'partials/base/elements';
 
-// 7. Layout
+// 7. Icons (SVG sprite helpers)
+@use 'partials/base/icons';
+
+// 8. Layout
 @use 'partials/base/layout';
 
-// 8. Header styles
+// 9. Header styles
 @use 'partials/page/header';
 
-// 9. Main content styles
+// 10. Main content styles
 @use 'partials/page/main';
 
-// 10. Footer styles
+// 11. Footer styles
 @use 'partials/page/footer';
 
-// 11. Development mode styles
+// 12. Development mode styles
 @use 'partials/base/dev';

@@ -1,0 +1,44 @@
+/**
+ * @file
+ * Shared icon styles for SVG sprite usage.
+ */
+
+.icon {
+  display: inline-block;
+  inline-size: 1em;
+  block-size: 1em;
+  vertical-align: middle;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* Ensure styling reaches externally referenced sprite symbols. */
+.icon use {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Monochrome colorable icon when source=file. */
+.icon--mask {
+  display: inline-block;
+  background-color: var(--icon-color, #000);
+  -webkit-mask-image: var(--icon-url);
+  mask-image: var(--icon-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.icon--xs { inline-size: 0.75rem; block-size: 0.75rem; }
+.icon--sm { inline-size: 1rem; block-size: 1rem; }
+.icon--md { inline-size: 1.25rem; block-size: 1.25rem; }
+.icon--lg { inline-size: 1.5rem; block-size: 1.5rem; }
+.icon--xl { inline-size: 2rem; block-size: 2rem; }

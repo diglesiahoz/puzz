@@ -348,6 +348,110 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
     ];
   }
 
+  // Icons section.
+  $config = \Drupal::configFactory()->get('puzz.settings');
+  $icons_include_all = (bool) ($config->get('icons_include_all') ?? TRUE);
+  $icons_selected = $config->get('icons_selected');
+  if (!is_array($icons_selected)) {
+    $icons_selected = [];
+  }
+  $available_icons = puzz_get_tabler_icon_names();
+  $available_custom_icons = puzz_get_custom_icon_names();
+  $icon_options = [];
+  foreach ($available_icons as $name) {
+    $icon_options[$name] = 'icon-' . $name;
+  }
+  foreach ($available_custom_icons as $name) {
+    $icon_options[$name] = 'icon-' . $name;
+  }
+
+  $form['styles']['icons'] = [
+    '#type' => 'details',
+    '#title' => t('Icons'),
+    '#open' => FALSE,
+    '#description' => t('Configure Tabler icon inclusion for the generated sprite. Custom icons from src/icons/custom are always included.'),
+    '#group' => 'styles',
+  ];
+
+  $form['styles']['icons']['icons_include_all'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Include all Tabler icons'),
+    '#default_value' => $icons_include_all,
+    '#description' => t('Warning: enabling this will increase sprite size and can affect frontend performance.'),
+    '#attributes' => [
+      'class' => ['js-puzz-icons-include-all'],
+    ],
+  ];
+
+  $form['styles']['icons']['icons_selected_container'] = [
+    '#type' => 'container',
+    '#attributes' => [
+      'class' => ['puzz-icons-grid', 'js-puzz-icons-grid'],
+    ],
+    '#states' => [
+      'visible' => [
+        ':input[name="icons_include_all"]' => ['checked' => FALSE],
+      ],
+    ],
+  ];
+
+  $form['styles']['icons']['icons_selected_container']['icons_search'] = [
+    '#type' => 'textfield',
+    '#title' => t('Search icons'),
+    '#description' => t('Type to filter icon names.'),
+    '#attributes' => [
+      'class' => ['js-puzz-icons-search'],
+      'placeholder' => t('Example: search, arrow, user'),
+    ],
+  ];
+
+  $form['styles']['icons']['icons_selected_container']['icons_actions'] = [
+    '#type' => 'actions',
+    '#attributes' => ['class' => ['puzz-icons-actions']],
+  ];
+
+  $form['styles']['icons']['icons_selected_container']['icons_actions']['show_selected'] = [
+    '#type' => 'button',
+    '#value' => t('Show selected'),
+    '#limit_validation_errors' => [],
+    '#attributes' => [
+      'type' => 'button',
+      'class' => ['button', 'button--small', 'js-puzz-icons-show-selected'],
+    ],
+  ];
+
+  $form['styles']['icons']['icons_selected_container']['icons_actions']['clear_selection'] = [
+    '#type' => 'button',
+    '#value' => t('Clear selection'),
+    '#limit_validation_errors' => [],
+    '#attributes' => [
+      'type' => 'button',
+      'class' => ['button', 'button--small', 'js-puzz-icons-clear-selection'],
+    ],
+  ];
+
+  $form['styles']['icons']['icons_selected_container']['icons_selected_summary'] = [
+    '#type' => 'item',
+    '#title' => t('Selection'),
+    '#markup' => '<div class="puzz-icons-selection-summary"><span class="js-puzz-icons-count">0 selected</span><div class="js-puzz-icons-selected-list puzz-icons-selected-list"></div></div>',
+  ];
+
+  $form['styles']['icons']['icons_selected_container']['icons_selected'] = [
+    '#type' => 'checkboxes',
+    '#title' => t('Icons available in sprite'),
+    '#default_value' => $icons_selected,
+    '#options' => $icon_options,
+    '#description' => t('Naming convention in Twig: icon-{name}. Example: icon-search or icon-custom-demo-puzz. Custom icons are always included in the final sprite.'),
+    '#attributes' => [],
+  ];
+
+  $form['#attached']['drupalSettings']['puzz']['icons'] = [
+    'spritePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/build/assets/icons/sprite.svg',
+    'adminPreviewSpritePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/build/assets/icons/admin-preview-sprite.svg',
+    'tablerBasePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/node_modules/@tabler/icons/icons/outline',
+    'customIconsBasePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/src/icons/custom',
+  ];
+
   // Submit handler to process resets
   // Add with higher weight to run after base form submit handler
   $form['#submit'][] = 'puzz_theme_settings_submit';
@@ -396,6 +500,19 @@ function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface
     }
   }
 
+  // Process icon settings.
+  $icons_include_all = !empty($values['icons_include_all']);
+  $raw_icons_selected = $values['icons_selected'] ?? [];
+  if (!is_array($raw_icons_selected)) {
+    $raw_icons_selected = [];
+  }
+  $icons_selected = array_values(array_filter($raw_icons_selected, static function ($value) {
+    return is_string($value) && $value !== '0' && $value !== '';
+  }));
+
+  $config->set('icons_include_all', $icons_include_all);
+  $config->set('icons_selected', $icons_selected);
+
   $config->save();
   
   // Get colors directly from the config object we just saved (not from cache)
@@ -408,6 +525,7 @@ function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface
   
   // Generate puzz.root.css file in public directory with current theme colors
   _puzz_generate_root_css($theme_name, $colors);
+  _puzz_generate_icons_config_json($theme_name, $icons_include_all, $icons_selected);
 }
 
 /**
@@ -627,4 +745,112 @@ function puzz_get_breakpoints(): array {
     // Silently fail and return empty array
     return [];
   }
+}
+
+/**
+ * Returns the list of available Tabler icon names (without "icon-" prefix).
+ */
+function puzz_get_tabler_icon_names(): array {
+  $theme_root = _puzz_theme_root();
+  $icons_dir = $theme_root . '/node_modules/@tabler/icons/icons/outline';
+  if (!is_dir($icons_dir) || !is_readable($icons_dir)) {
+    return [];
+  }
+
+  $entries = scandir($icons_dir);
+  if (!is_array($entries)) {
+    return [];
+  }
+
+  $icons = [];
+  foreach ($entries as $entry) {
+    if ($entry === '.' || $entry === '..') {
+      continue;
+    }
+    if (!str_ends_with($entry, '.svg')) {
+      continue;
+    }
+    $icons[] = basename($entry, '.svg');
+  }
+  sort($icons, SORT_NATURAL);
+  return $icons;
+}
+
+/**
+ * Returns custom icon names from src/icons/custom (without "icon-" prefix).
+ */
+function puzz_get_custom_icon_names(): array {
+  $theme_root = _puzz_theme_root();
+  $icons_dir = $theme_root . '/src/icons/custom';
+  if (!is_dir($icons_dir) || !is_readable($icons_dir)) {
+    return [];
+  }
+
+  $entries = scandir($icons_dir);
+  if (!is_array($entries)) {
+    return [];
+  }
+
+  $icons = [];
+  foreach ($entries as $entry) {
+    if ($entry === '.' || $entry === '..') {
+      continue;
+    }
+    if (!str_ends_with($entry, '.svg')) {
+      continue;
+    }
+    $name = strtolower((string) basename($entry, '.svg'));
+    $name = preg_replace('/[^a-z0-9-]+/', '-', $name);
+    $name = preg_replace('/-{2,}/', '-', $name);
+    $name = trim((string) $name, '-');
+    if ($name === '') {
+      continue;
+    }
+    if (!str_starts_with($name, 'custom-')) {
+      $name = 'custom-' . $name;
+    }
+    $icons[] = $name;
+  }
+
+  $icons = array_values(array_unique($icons));
+  sort($icons, SORT_NATURAL);
+  return $icons;
+}
+
+/**
+ * Exports icon selection settings to public file for build pipeline.
+ */
+function _puzz_generate_icons_config_json(string $theme_name, bool $include_all, array $selected): void {
+  $file_system = \Drupal::service('file_system');
+  $public_path = $file_system->realpath('public://');
+  if (!$public_path || !is_dir($public_path) || !is_writable($public_path)) {
+    \Drupal::logger('puzz')->warning('Could not write icon selection file in public://');
+    return;
+  }
+
+  $selected = array_values(array_unique(array_filter(array_map(static function ($name) {
+    if (!is_string($name) || $name === '') {
+      return NULL;
+    }
+    return preg_replace('/^icon-/', '', trim($name));
+  }, $selected))));
+  sort($selected, SORT_NATURAL);
+
+  $payload = [
+    'theme' => $theme_name,
+    'include_all' => $include_all,
+    'selected' => $selected,
+  ];
+  $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+  if ($json === FALSE) {
+    \Drupal::logger('puzz')->error('Could not encode icon selection JSON.');
+    return;
+  }
+
+  $target = $public_path . '/puzz.icons.json';
+  if (@file_put_contents($target, $json) === FALSE) {
+    \Drupal::logger('puzz')->error('Could not write icon selection file @file', ['@file' => $target]);
+    return;
+  }
+  @chmod($target, 0664);
 }

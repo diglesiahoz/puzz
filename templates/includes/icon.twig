@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Icon helper using the compiled SVG sprite.
+ *
+ * Required:
+ * - name: Icon symbol id without leading "#", e.g. "icon-search" or "icon-custom-brand".
+ *
+ * Optional:
+ * - class: Extra CSS classes.
+ * - label: Accessible label. If empty, icon is decorative.
+ */
+#}
+{% set icon_name = name|default('')|trim %}
+{% if icon_name %}
+  {% set icon_classes = ['icon'] %}
+  {% if class is defined and class %}
+    {% set icon_classes = icon_classes|merge([class]) %}
+  {% endif %}
+  {% set sprite_path = '/' ~ active_theme_path() ~ '/build/assets/icons/sprite.svg' %}
+  <svg
+    class="{{ icon_classes|join(' ') }}"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    {% if label is defined and label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}
+  >
+    <use href="{{ sprite_path }}#{{ icon_name }}"></use>
+  </svg>
+{% endif %}

@@ -81,7 +81,7 @@
         {% endif %}
         {{ page.content }}
 
-        {#
+        
         
         <h3>Components Examples</h3>
 
@@ -108,7 +108,34 @@
           }
         } }}
 
-        #}
+        
+
+
+        {{ {
+          '#type': 'component',
+          '#component': 'puzz:icon',
+          '#props': {
+            'name': 'icon-search',
+            'source': 'file',
+            'size': 'md',
+            'label': 'Search',
+            'color': '#0ea5e9'
+
+          }
+        } }}
+
+
+        {{ {
+          '#type': 'component',
+          '#component': 'puzz:icon',
+          '#props': {
+            'name': 'icon-custom-demo-puzz',
+            'source': 'file',
+            'size': 'md',
+            'label': 'Search',
+            'color': 'red'
+          }
+        } }}
 
       </main>
 
