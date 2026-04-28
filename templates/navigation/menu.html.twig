@@ -44,7 +44,37 @@
         ]
       %}
       <li{{ item.attributes.addClass(classes) }}>
-        {{ link(item.title, item.url) }}
+        {% set route_name = item.url.isRouted ? item.url.routeName : '' %}
+        {% set icon_name = '' %}
+        {% set system_path = '' %}
+        {% if route_name == 'user.login' %}
+          {% set icon_name = 'icon-login' %}
+          {% set system_path = 'user/login' %}
+        {% elseif route_name == 'user.logout' %}
+          {% set icon_name = 'icon-logout' %}
+          {% set system_path = 'user/logout' %}
+        {% elseif route_name == 'entity.user.canonical' or route_name == 'user.page' %}
+          {% set icon_name = 'icon-user-square-rounded' %}
+          {% set system_path = 'user' %}
+        {% endif %}
+
+        {% if icon_name %}
+          <a href="{{ item.url.toString }}" class="has-inline-icon" data-drupal-link-system-path="{{ system_path }}">
+            {{ {
+              '#type': 'component',
+              '#component': 'puzz:icon',
+              '#props': {
+                'name': icon_name,
+                'source': 'sprite',
+                'size': 'lg',
+                'color': 'var(--color-1)'
+              }
+            } }}
+            <span>{{ item.title }}</span>
+          </a>
+        {% else %}
+          {{ link(item.title, item.url) }}
+        {% endif %}
         {% if item.below %}
           {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
         {% endif %}

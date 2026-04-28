@@ -7,6 +7,8 @@
  */
 #}
 
+{{ page_top }}
+
 {# Header (navbar, header and menu) - rendered directly without SDC component #}
 <div id="navbar-wrapper">
   <div id="navbar" role="banner">
@@ -108,32 +110,30 @@
           }
         } }}
 
-        
+        {# Iconos #}
+        {{ {
+          '#type': 'component',
+          '#component': 'puzz:icon',
+          '#props': {
+            'name': 'icon-search',
 
+            'size': 'md',
+            'label': 'Search',
+            'color': 'red'
+
+          }
+        } }}
 
         {{ {
           '#type': 'component',
           '#component': 'puzz:icon',
           '#props': {
             'name': 'icon-search',
-            'source': 'file',
+
             'size': 'md',
             'label': 'Search',
             'color': '#0ea5e9'
 
-          }
-        } }}
-
-
-        {{ {
-          '#type': 'component',
-          '#component': 'puzz:icon',
-          '#props': {
-            'name': 'icon-custom-demo-puzz',
-            'source': 'file',
-            'size': 'md',
-            'label': 'Search',
-            'color': 'red'
           }
         } }}
 
@@ -173,3 +173,5 @@
   </div>
 </div>
 {% endif %}
+
+{{ page_bottom }}

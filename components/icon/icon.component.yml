@@ -47,11 +47,11 @@ props:
     source:
       type: string
       title: Render source
-      description: file loads direct SVG file (recommended). sprite uses compiled sprite symbol.
+      description: sprite uses compiled sprite symbol (recommended). file loads direct SVG file.
       enum:
         - file
         - sprite
-      default: file
+      default: sprite
       examples:
-        - file
         - sprite
+        - file

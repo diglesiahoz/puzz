@@ -572,6 +572,17 @@ function puzz_preprocess_page(array &$variables) {
   if ($node && $node->bundle() === 'puzz_landing') {
     // @todo
   }
+
+  // Inject inline SVG sprite inside body to support <use href="#icon-id"> reliably.
+  $sprite_markup = _puzz_get_inline_icon_sprite_markup();
+  if ($sprite_markup !== '') {
+    $variables['page_top']['puzz_inline_icon_sprite'] = [
+      '#markup' => \Drupal\Core\Render\Markup::create(
+        '<div style="position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;" aria-hidden="true" focusable="false" data-drupal-selector="puzz-inline-icon-sprite">' . $sprite_markup . '</div>'
+      ),
+      '#weight' => -1000,
+    ];
+  }
 }
 
 /**
@@ -608,6 +619,32 @@ function puzz_preprocess_html(array &$variables): void {
   if ($breakpoints && is_array($breakpoints)) {
     $variables['#attached']['drupalSettings']['puzz']['breakpoints'] = $breakpoints;
   }
+
+}
+
+/**
+ * Returns sanitized inline SVG sprite markup for icon usage.
+ */
+function _puzz_get_inline_icon_sprite_markup(): string {
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('puzz');
+  $sprite_file = \Drupal::root() . '/' . $theme_path . '/build/assets/icons/sprite.svg';
+  if (!is_readable($sprite_file)) {
+    return '';
+  }
+
+  $sprite = file_get_contents($sprite_file);
+  if (!is_string($sprite) || $sprite === '') {
+    return '';
+  }
+
+  // Remove script tags that can be injected by browser extensions/proxies.
+  $sprite = preg_replace('/<script\b[^>]*>[\s\S]*?<\/script>/i', '', $sprite);
+  $sprite = preg_replace('/<script\b[^>]*\/>/i', '', $sprite);
+  if (!is_string($sprite)) {
+    return '';
+  }
+
+  return trim($sprite);
 }
 
 /**

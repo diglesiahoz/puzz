@@ -8,7 +8,7 @@
 {% set icon_name = name|default('')|trim %}
 {% if icon_name %}
   {% set icon_size = size|default('md') %}
-  {% set icon_source = source|default('file') %}
+  {% set icon_source = source|default('sprite') %}
   {% set classes = ['icon', 'icon--' ~ icon_size] %}
   {% if class is defined and class %}
     {% set classes = classes|merge([class]) %}
@@ -17,7 +17,6 @@
   {% set raw_name = icon_name|replace({'icon-': ''}) %}
 
   {% if icon_source == 'sprite' %}
-    {% set sprite_path = '/' ~ active_theme_path() ~ '/build/assets/icons/sprite.svg' %}
     <svg
       class="{{ classes|join(' ') }}"
       fill="none"
@@ -25,11 +24,10 @@
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      {% if color is defined and color %}style="color: {{ color|e('html_attr') }};"{% endif %}
+      style="color: {{ icon_color|e('html_attr') }};"
       {% if label is defined and label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}
     >
-      <use href="{{ sprite_path }}#{{ icon_name }}"></use>
-      <use xlink:href="{{ sprite_path }}#{{ icon_name }}"></use>
+      <use href="#{{ icon_name }}" xlink:href="#{{ icon_name }}"></use>
     </svg>
   {% else %}
     {% set file_path = raw_name starts with 'custom-' ? '/' ~ active_theme_path() ~ '/src/icons/custom/' ~ raw_name ~ '.svg' : '/' ~ active_theme_path() ~ '/node_modules/@tabler/icons/icons/outline/' ~ raw_name ~ '.svg' %}
