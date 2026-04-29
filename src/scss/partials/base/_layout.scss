@@ -38,6 +38,7 @@ body.page-node-type-puzz-landing {
     padding: 0;
     height: 100%;
     min-width: $container-md-min;
+    width: $container-md-min;
   }
 }
 
@@ -68,4 +69,51 @@ body.page-node-type-puzz-landing {
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+// Navigation/menu lists should never render native bullets.
+.dialog-off-canvas-main-canvas ul.menu,
+.dialog-off-canvas-main-canvas ul.links,
+.dialog-off-canvas-main-canvas ul.tabs,
+.dialog-off-canvas-main-canvas ul.primary,
+.dialog-off-canvas-main-canvas ul.secondary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Keep menu contextual actions hidden until user interacts with the menu block.
+.contextual-region.block-menu:not(:hover):not(:focus-within):not(.focus) > .contextual,
+nav.contextual-region:not(:hover):not(:focus-within):not(.focus) > .contextual {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.contextual-region.block-menu:hover > .contextual,
+.contextual-region.block-menu:focus-within > .contextual,
+.contextual-region.block-menu.focus > .contextual,
+.contextual-region.block-menu > .contextual.open,
+nav.contextual-region:hover > .contextual,
+nav.contextual-region:focus-within > .contextual,
+nav.contextual-region.focus > .contextual,
+nav.contextual-region > .contextual.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+// Unified hover effect for icon links used in menus.
+.dialog-off-canvas-main-canvas nav a.has-inline-icon,
+.dialog-off-canvas-main-canvas .block-menu a.has-inline-icon {
+  text-decoration: none;
+  transition: opacity 0.18s ease-out, color 0.18s ease-out;
+}
+
+.dialog-off-canvas-main-canvas nav a.has-inline-icon:hover,
+.dialog-off-canvas-main-canvas nav a.has-inline-icon:focus,
+.dialog-off-canvas-main-canvas .block-menu a.has-inline-icon:hover,
+.dialog-off-canvas-main-canvas .block-menu a.has-inline-icon:focus {
+  text-decoration: none;
+  opacity: 0.82;
 }

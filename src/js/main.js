@@ -36,7 +36,7 @@
       document.querySelectorAll('#menu .block-menu ul > li > ul.open').forEach(ul => {
         ul.classList.remove('open');
       });
-      document.querySelectorAll('#menu .block-menu ul > li > span.open').forEach(span => {
+      document.querySelectorAll('#menu .block-menu ul > li > span.puzz-menu-toggle.open').forEach(span => {
         span.classList.remove('open');
       });
     }
@@ -63,15 +63,16 @@
 
       // Add <span> to <li> elements that contain a nested <ul>
       once('mobileMenuSpans', '#menu .block-menu ul > li', context).forEach(li => {
-        if (li.querySelector('ul') && !li.querySelector('span')) {
+        if (li.querySelector(':scope > ul') && !li.querySelector(':scope > span.puzz-menu-toggle')) {
           const span = document.createElement('span');
+          span.className = 'puzz-menu-toggle';
           li.appendChild(span);
         }
       });
 
       // Mark active trail items as open (only on mobile)
       if (!isDesktop()) {
-        once('mobileMenuActiveTrail', '#menu .block-menu li.active-trail > span', context).forEach(span => {
+        once('mobileMenuActiveTrail', '#menu .block-menu li.active-trail > span.puzz-menu-toggle', context).forEach(span => {
           const ul = span.previousElementSibling;
           if (ul && ul.tagName === 'UL') {
             ul.classList.add('open');
@@ -81,7 +82,7 @@
       }
 
       // Toggle submenu visibility when clicking the <span> (only on mobile)
-      once('mobileMenuToggle', '#menu .block-menu ul > li > span', context).forEach(span => {
+      once('mobileMenuToggle', '#menu .block-menu ul > li > span.puzz-menu-toggle', context).forEach(span => {
         span.addEventListener('click', (e) => {
           // Only handle clicks on mobile
           if (isDesktop()) {

@@ -23,20 +23,6 @@
   stroke-linejoin: round;
 }
 
-/* Monochrome colorable icon when source=file. */
-.icon--mask {
-  display: inline-block;
-  background-color: var(--icon-color, #000);
-  -webkit-mask-image: var(--icon-url);
-  mask-image: var(--icon-url);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
 .icon--xs { inline-size: 0.75rem; block-size: 0.75rem; }
 .icon--sm { inline-size: 1rem; block-size: 1rem; }
 .icon--md { inline-size: 1.25rem; block-size: 1.25rem; }

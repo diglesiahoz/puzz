@@ -18,9 +18,24 @@ footer {
 }
 
 #footer {
-  padding: 2.5rem 0 0 0;
+  //padding: 2.5rem 0 0 0;
   color: #ffffff;
   background: linear-gradient(0deg, $color-black, $color-3);
+
+  .region-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1.25rem;
+
+    > * {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  }
 
   .block {
     & > h2 {
@@ -92,20 +107,41 @@ footer {
 
   // Footer menu
   .block-menu {
-    padding-bottom: 2.5rem;
+    //padding-bottom: 2.5rem;
 
     ul.menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 0.5rem 1.25rem;
+      text-align: center;
+
       li {
+        list-style: none;
         a {
           display: block;
           padding: 0.5rem 0;
-          text-decoration: underline;
+          text-decoration: none;
           color: #ffffff;
           font-size: 1.125rem;
 
           &:hover {
             color: color-mix(in srgb, $color-white 75%, transparent);
           }
+        }
+
+        a.has-inline-icon {
+          align-items: center;
+          display: inline-flex;
+          gap: 1rem 0.3rem;
+        }
+
+        a.has-inline-icon > .has-inline-icon__label {
+          display: inline-flex;
+          align-items: baseline;
+          line-height: 1;
         }
       }
     }
@@ -117,7 +153,7 @@ footer {
   text-align: center;
   color: #ffffff;
   background: $color-black;
-  padding: 0 0 3.75rem 0;
+  padding: 0 0 2rem 0;
 
   .block {
     margin: 0 0 1.25rem 0;
@@ -151,7 +187,11 @@ footer {
 
   .block-menu {
     ul.menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
       li {
+        list-style: none;
         margin: 0;
         line-height: 1.5;
 
@@ -176,16 +216,13 @@ footer {
 // BREAKPOINT: SM (Small devices)
 // ============================================================================
 @include mq('sm') {
-  #footer {
-    .region-footer {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-
-      .block-system-branding-block {
-        grid-column: 1 / span 2;
-      }
-    }
-  }
+  //#footer {
+  //  .region-footer {
+  //    display: flex;
+  //    flex-direction: column;
+  //    align-items: center;
+  //  }
+  //}
 }
 
 // ============================================================================
@@ -194,12 +231,40 @@ footer {
 @include mq('md') {
   #footer {
     .region-footer {
-      display: flex;
-      gap: 2.5rem;
+      width: 100%;
+      //display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1.25rem;
+
+      .block-system-branding-block {
+        grid-column: 1;
+        justify-self: start;
+        position: static;
+        transform: none;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: auto;
+        padding: 0 0 0 0;
+      }
     }
 
     .block-menu {
+      grid-column: 2;
+      justify-self: center;
       margin-bottom: 0;
+      position: static;
+      left: auto;
+      transform: none;
+
+      ul.menu {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.625rem 1.5rem;
+      }
 
       ul.menu li a {
         padding: 0.5625rem 0 0.5625rem 0;
@@ -210,12 +275,12 @@ footer {
   }
 
   #copyright {
-    padding: 1.875rem 0 3.75rem 0;
+    //padding: 1.875rem 0 3.75rem 0;
 
     .region {
       display: flex;
       justify-content: center;
-      padding-top: 1.875rem;
+      //padding-top: 1.875rem;
 
       .block {
         margin-right: 1.875rem;

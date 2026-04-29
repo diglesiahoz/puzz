@@ -10,7 +10,7 @@
 
 #breadcrumb {
   .breadcrumb {
-    padding-bottom: 0.5em;
+    padding: 1rem 0;
 
     ol {
       margin: 0;
@@ -26,6 +26,13 @@
       margin: 0;
       padding: 0;
       list-style-type: none;
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        line-height: 1;
+      }
 
       &::before {
         content: ' \BB ';

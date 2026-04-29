@@ -9,6 +9,7 @@
     "build": "npm run build:prod",
     "build:dev": "node scripts/build.js dev",
     "build:prod": "node scripts/build.js prod",
+    "build:icons": "node scripts/build.js icons",
     "dev": "node scripts/dev-server.js",
     "clean": "rimraf build",
     "storybook": "storybook dev -p 6006",

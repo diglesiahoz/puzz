@@ -616,7 +616,7 @@ async function buildIconSprite(silent = false) {
   const previewSpriteContent = previewSprite.toString({ inline: true });
   const previewSpriteFile = join(buildIconsDir, 'admin-preview-sprite.svg');
   writeFileSync(previewSpriteFile, previewSpriteContent, 'utf-8');
-  chmodSync(previewSpriteFile, 0o644);
+  chmodSync(previewSpriteFile, 0o664);
 
   if (!added) {
     if (!silent) console.warn('⚠ Icon sprite not generated: no selected icons.');
@@ -626,8 +626,8 @@ async function buildIconSprite(silent = false) {
   const spriteContent = sprite.toString({ inline: true });
   const spriteFile = join(buildIconsDir, 'sprite.svg');
   writeFileSync(spriteFile, spriteContent, 'utf-8');
-  chmodSync(spriteFile, 0o644);
-  chmodSync(buildIconsDir, 0o755);
+  chmodSync(spriteFile, 0o664);
+  chmodSync(buildIconsDir, 0o775);
   if (!silent) {
     const modeLabel = includeAll ? 'all tabler icons' : `selected tabler icons (${selectedIcons.size})`;
     console.log(`✓ Built ... assets/icons/admin-preview-sprite.svg (${previewAdded} icons)`);
@@ -701,12 +701,36 @@ async function build(silent = false, mode = 'dev') {
   }
 }
 
+/**
+ * Build only SVG sprites (frontend + admin preview).
+ */
+async function buildIconsOnly(silent = false) {
+  try {
+    await mkdir(buildDir, { recursive: true });
+    await mkdir(buildIconsDir, { recursive: true });
+    await buildIconSprite(silent);
+    if (!silent) {
+      console.log('✅ Icon sprite rebuild complete!');
+    }
+  } catch (error) {
+    if (!silent) {
+      console.error('✗ Icon sprite rebuild failed:', error.message);
+    }
+    throw error;
+  }
+}
+
 // Run build if called directly
 const isMainModule = import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('build.js');
 if (isMainModule) {
-  const mode = process.argv[2] === 'prod' ? 'prod' : 'dev';
-  build(false, mode).catch(() => process.exit(1));
+  const arg = (process.argv[2] || 'dev').toLowerCase();
+  if (arg === 'icons') {
+    buildIconsOnly(false).catch(() => process.exit(1));
+  } else {
+    const mode = arg === 'prod' ? 'prod' : 'dev';
+    build(false, mode).catch(() => process.exit(1));
+  }
 }
 
 // ✅ Export build for ESM
-export { build };
+export { build, buildIconsOnly };

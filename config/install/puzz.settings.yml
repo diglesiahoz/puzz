@@ -1,0 +1,8 @@
+icons_enabled: true
+icons_include_all: false
+icons_selected:
+  - login
+  - logout
+  - search
+  - user-square-rounded
+  - custom-demo-puzz

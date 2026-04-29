@@ -350,6 +350,7 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
 
   // Icons section.
   $config = \Drupal::configFactory()->get('puzz.settings');
+  $icons_enabled = (bool) ($config->get('icons_enabled') ?? TRUE);
   $icons_include_all = (bool) ($config->get('icons_include_all') ?? TRUE);
   $icons_selected = $config->get('icons_selected');
   if (!is_array($icons_selected)) {
@@ -373,6 +374,13 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
     '#group' => 'styles',
   ];
 
+  $form['styles']['icons']['icons_enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enable icons globally on site'),
+    '#default_value' => $icons_enabled,
+    '#description' => t('When disabled, icon rendering is turned off globally (menus, breadcrumb and other theme icon usages).'),
+  ];
+
   $form['styles']['icons']['icons_include_all'] = [
     '#type' => 'checkbox',
     '#title' => t('Include all Tabler icons'),
@@ -380,6 +388,11 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
     '#description' => t('Warning: enabling this will increase sprite size and can affect frontend performance.'),
     '#attributes' => [
       'class' => ['js-puzz-icons-include-all'],
+    ],
+    '#states' => [
+      'visible' => [
+        ':input[name="icons_enabled"]' => ['checked' => TRUE],
+      ],
     ],
   ];
 
@@ -390,6 +403,7 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
     ],
     '#states' => [
       'visible' => [
+        ':input[name="icons_enabled"]' => ['checked' => TRUE],
         ':input[name="icons_include_all"]' => ['checked' => FALSE],
       ],
     ],
@@ -446,7 +460,7 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
   ];
 
   $form['#attached']['drupalSettings']['puzz']['icons'] = [
-    'spritePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/build/assets/icons/sprite.svg',
+    'spritePath' => _puzz_get_public_icon_sprite_url(),
     'adminPreviewSpritePath' => \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('puzz') . '/build/assets/icons/admin-preview-sprite.svg',
   ];
 
@@ -499,6 +513,7 @@ function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface
   }
 
   // Process icon settings.
+  $icons_enabled = !empty($values['icons_enabled']);
   $icons_include_all = !empty($values['icons_include_all']);
   $raw_icons_selected = $values['icons_selected'] ?? [];
   if (!is_array($raw_icons_selected)) {
@@ -508,6 +523,7 @@ function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface
     return is_string($value) && $value !== '0' && $value !== '';
   }));
 
+  $config->set('icons_enabled', $icons_enabled);
   $config->set('icons_include_all', $icons_include_all);
   $config->set('icons_selected', $icons_selected);
 
@@ -524,6 +540,174 @@ function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface
   // Generate puzz.root.css file in public directory with current theme colors
   _puzz_generate_root_css($theme_name, $colors);
   _puzz_generate_icons_config_json($theme_name, $icons_include_all, $icons_selected);
+  _puzz_regenerate_icon_sprite($theme_name);
+}
+
+/**
+ * Rebuilds icon sprite files after saving theme settings.
+ */
+function _puzz_regenerate_icon_sprite(string $theme_name): void {
+  if ($theme_name !== 'puzz') {
+    return;
+  }
+
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('puzz');
+  $preview_sprite = \Drupal::root() . '/' . $theme_path . '/build/assets/icons/admin-preview-sprite.svg';
+  if (!is_readable($preview_sprite)) {
+    \Drupal::logger('puzz')->warning('Icon sprite rebuild skipped: preview sprite file not found/readable at @file.', ['@file' => $preview_sprite]);
+    \Drupal::messenger()->addWarning(t('No se pudo regenerar el sprite de iconos: falta admin-preview-sprite.svg.'));
+    return;
+  }
+
+  $preview_content = file_get_contents($preview_sprite);
+  if (!is_string($preview_content) || trim($preview_content) === '') {
+    \Drupal::logger('puzz')->error('Icon sprite rebuild failed: empty preview sprite at @file.', ['@file' => $preview_sprite]);
+    \Drupal::messenger()->addError(t('Error al regenerar el sprite de iconos: el sprite de vista previa está vacío.'));
+    return;
+  }
+
+  preg_match_all('/<symbol\b[^>]*\bid="([^"]+)"[^>]*>[\s\S]*?<\/symbol>/i', $preview_content, $matches);
+  $symbols = $matches[0] ?? [];
+  $ids = $matches[1] ?? [];
+  if (empty($symbols) || count($symbols) !== count($ids)) {
+    \Drupal::logger('puzz')->error('Icon sprite rebuild failed: no symbols parsed from @file.', ['@file' => $preview_sprite]);
+    \Drupal::messenger()->addError(t('Error al regenerar el sprite de iconos: no se pudieron leer símbolos SVG.'));
+    return;
+  }
+
+  $icon_map = [];
+  foreach ($ids as $idx => $id) {
+    $normalized_id = strtolower(trim((string) $id));
+    if ($normalized_id === '') {
+      continue;
+    }
+    $icon_map[$normalized_id] = $symbols[$idx];
+  }
+
+  $config = \Drupal::config('puzz.settings');
+  $include_all = (bool) ($config->get('icons_include_all') ?? TRUE);
+  $selected = $config->get('icons_selected') ?? [];
+  if (!is_array($selected)) {
+    $selected = [];
+  }
+
+  $selected_lookup = [];
+  foreach ($selected as $raw_name) {
+    $name = strtolower(trim((string) $raw_name));
+    if ($name === '') {
+      continue;
+    }
+    $name = preg_replace('/^icon-/', '', $name);
+    if (!is_string($name) || $name === '') {
+      continue;
+    }
+    $selected_lookup['icon-' . $name] = TRUE;
+  }
+
+  $selected_symbols = [];
+  foreach ($icon_map as $symbol_id => $symbol_markup) {
+    $is_custom = str_starts_with($symbol_id, 'icon-custom-');
+    $is_selected = isset($selected_lookup[$symbol_id]);
+    if ($is_custom) {
+      if ($is_selected) {
+        $selected_symbols[] = $symbol_markup;
+      }
+      continue;
+    }
+    if ($include_all || $is_selected) {
+      $selected_symbols[] = $symbol_markup;
+    }
+  }
+
+  if (empty($selected_symbols)) {
+    \Drupal::logger('puzz')->warning('Icon sprite rebuild produced an empty selection.');
+    \Drupal::messenger()->addWarning(t('No se generó el sprite: no hay iconos seleccionados.'));
+    return;
+  }
+
+  $sprite_markup = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none">' . implode('', $selected_symbols) . '</svg>';
+  $target = _puzz_get_public_icon_sprite_realpath();
+  if ($target === '') {
+    \Drupal::logger('puzz')->error('Icon sprite rebuild failed: could not resolve public:// path.');
+    \Drupal::messenger()->addError(t('Error al regenerar el sprite de iconos: no se pudo resolver public://.'));
+    return;
+  }
+
+  if (@file_put_contents($target, $sprite_markup) === FALSE) {
+    \Drupal::logger('puzz')->error('Icon sprite rebuild failed writing @file.', ['@file' => $target]);
+    \Drupal::messenger()->addError(t('Error al regenerar el sprite de iconos. Revisa permisos de public://.'));
+    return;
+  }
+  @chmod($target, 0664);
+
+  \Drupal::logger('puzz')->notice('Icon sprite rebuilt automatically in public:// after saving theme settings.');
+  \Drupal::messenger()->addStatus(t('Icon sprite rebuilt automatically.'));
+}
+
+/**
+ * Returns absolute path for the generated public icon sprite file.
+ */
+function _puzz_get_public_icon_sprite_realpath(): string {
+  $file_system = \Drupal::service('file_system');
+  $public_path = $file_system->realpath('public://');
+  if (!$public_path || !is_dir($public_path) || !is_writable($public_path)) {
+    return '';
+  }
+  return $public_path . '/puzz.sprite.svg';
+}
+
+/**
+ * Returns URL for icon sprite, preferring generated public file.
+ */
+function _puzz_get_public_icon_sprite_url(): string {
+  $base_path = \Drupal::request()->getBasePath();
+  $file_url_generator = \Drupal::service('file_url_generator');
+  $target = _puzz_get_public_icon_sprite_realpath();
+  if ($target !== '' && is_readable($target)) {
+    return $file_url_generator->generateString('public://puzz.sprite.svg');
+  }
+
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('puzz');
+  return $base_path . '/' . $theme_path . '/build/assets/icons/sprite.svg';
+}
+
+/**
+ * Reads icon sprite markup, preferring generated public file.
+ */
+function _puzz_read_icon_sprite_markup(): string {
+  $public_sprite = _puzz_get_public_icon_sprite_realpath();
+  if ($public_sprite !== '' && is_readable($public_sprite)) {
+    $sprite = file_get_contents($public_sprite);
+    return is_string($sprite) ? $sprite : '';
+  }
+
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('puzz');
+  $build_sprite = \Drupal::root() . '/' . $theme_path . '/build/assets/icons/sprite.svg';
+  if (!is_readable($build_sprite)) {
+    return '';
+  }
+
+  $sprite = file_get_contents($build_sprite);
+  return is_string($sprite) ? $sprite : '';
+}
+
+/**
+ * Returns sanitized inline SVG sprite markup for icon usage.
+ */
+function _puzz_get_inline_icon_sprite_markup(): string {
+  $sprite = _puzz_read_icon_sprite_markup();
+  if ($sprite === '') {
+    return '';
+  }
+
+  // Remove script tags that can be injected by browser extensions/proxies.
+  $sprite = preg_replace('/<script\b[^>]*>[\s\S]*?<\/script>/i', '', $sprite);
+  $sprite = preg_replace('/<script\b[^>]*\/>/i', '', $sprite);
+  if (!is_string($sprite)) {
+    return '';
+  }
+
+  return trim($sprite);
 }
 
 /**
@@ -572,15 +756,38 @@ function puzz_preprocess_page(array &$variables) {
   }
 
   // Inject inline SVG sprite inside body to support <use href="#icon-id"> reliably.
-  $sprite_markup = _puzz_get_inline_icon_sprite_markup();
-  if ($sprite_markup !== '') {
-    $variables['page_top']['puzz_inline_icon_sprite'] = [
-      '#markup' => \Drupal\Core\Render\Markup::create(
-        '<div style="position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;" aria-hidden="true" focusable="false" data-drupal-selector="puzz-inline-icon-sprite">' . $sprite_markup . '</div>'
-      ),
-      '#weight' => -1000,
-    ];
+  if (_puzz_icons_enabled()) {
+    $sprite_markup = _puzz_get_inline_icon_sprite_markup();
+    if ($sprite_markup !== '') {
+      $variables['page_top']['puzz_inline_icon_sprite'] = [
+        '#markup' => \Drupal\Core\Render\Markup::create(
+          '<div style="position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;" aria-hidden="true" focusable="false" data-drupal-selector="puzz-inline-icon-sprite">' . $sprite_markup . '</div>'
+        ),
+        '#weight' => -1000,
+      ];
+    }
   }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for menu templates.
+ */
+function puzz_preprocess_menu(array &$variables): void {
+  $variables['puzz_icons_enabled'] = _puzz_icons_enabled();
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for breadcrumb templates.
+ */
+function puzz_preprocess_breadcrumb(array &$variables): void {
+  $variables['puzz_icons_enabled'] = _puzz_icons_enabled();
+}
+
+/**
+ * Returns whether icons are globally enabled in theme settings.
+ */
+function _puzz_icons_enabled(): bool {
+  return (bool) (\Drupal::config('puzz.settings')->get('icons_enabled') ?? TRUE);
 }
 
 /**
@@ -620,30 +827,6 @@ function puzz_preprocess_html(array &$variables): void {
 
 }
 
-/**
- * Returns sanitized inline SVG sprite markup for icon usage.
- */
-function _puzz_get_inline_icon_sprite_markup(): string {
-  $theme_path = \Drupal::service('extension.list.theme')->getPath('puzz');
-  $sprite_file = \Drupal::root() . '/' . $theme_path . '/build/assets/icons/sprite.svg';
-  if (!is_readable($sprite_file)) {
-    return '';
-  }
-
-  $sprite = file_get_contents($sprite_file);
-  if (!is_string($sprite) || $sprite === '') {
-    return '';
-  }
-
-  // Remove script tags that can be injected by browser extensions/proxies.
-  $sprite = preg_replace('/<script\b[^>]*>[\s\S]*?<\/script>/i', '', $sprite);
-  $sprite = preg_replace('/<script\b[^>]*\/>/i', '', $sprite);
-  if (!is_string($sprite)) {
-    return '';
-  }
-
-  return trim($sprite);
-}
 
 /**
  * Generates root.css file in public directory with current theme colors.

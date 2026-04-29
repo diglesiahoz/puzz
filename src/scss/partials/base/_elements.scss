@@ -274,21 +274,30 @@ nav.tabs {
     border: 0;
     border-bottom: 0.122rem solid #bad9e5;
     li {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
       a {
-        height: 4rem;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
         margin: 0;
         padding: 0 2rem;
+        font-weight: bold;
         white-space: nowrap;
         color: #6f7a98;
         background: none;
         //font-size: 1.0625rem;
-        line-height: 3.75rem;
+        line-height: 1;
         text-decoration: none;
+        min-height: 4rem;
+        border-bottom: 0.5rem solid transparent;
+        transition: color 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-bottom-color 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 
         &:hover {
           color: $color-1;
           border-bottom: 0.4375rem solid $color-1;
-          font-weight: bold;
+          
         }
       }
       &.is-active {

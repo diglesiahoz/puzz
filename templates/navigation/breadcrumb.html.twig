@@ -14,7 +14,21 @@
     {% for item in breadcrumb %}
       <li>
         {% if item.url %}
-          <a href="{{ item.url }}">{{ item.text }}</a>
+          <a href="{{ item.url }}">
+            {% if puzz_icons_enabled|default(true) and loop.first %}
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:icon',
+                '#props': {
+                  'name': 'icon-home',
+                  'size': 'md',
+                  'label': 'Home'|t,
+                  'color': 'currentColor'
+                }
+              } }}
+            {% endif %}
+            {{ item.text }}
+          </a>
         {% else %}
           {{ item.text }}
         {% endif %}

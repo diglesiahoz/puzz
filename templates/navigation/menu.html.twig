@@ -24,9 +24,9 @@
   We call a macro which calls itself to render the full tree.
   @see https://twig.symfony.com/doc/3.x/tags/macro.html
 #}
-{{ menus.menu_links(items, attributes, 0) }}
+{{ menus.menu_links(items, attributes, 0, menu_name|default('')) }}
 
-{% macro menu_links(items, attributes, menu_level) %}
+{% macro menu_links(items, attributes, menu_level, menu_name) %}
   {% import _self as menus %}
   {% if items %}
     {% if menu_level == 0 %}
@@ -44,39 +44,37 @@
         ]
       %}
       <li{{ item.attributes.addClass(classes) }}>
-        {% set route_name = item.url.isRouted ? item.url.routeName : '' %}
-        {% set icon_name = '' %}
-        {% set system_path = '' %}
-        {% if route_name == 'user.login' %}
-          {% set icon_name = 'icon-login' %}
-          {% set system_path = 'user/login' %}
-        {% elseif route_name == 'user.logout' %}
-          {% set icon_name = 'icon-logout' %}
-          {% set system_path = 'user/logout' %}
-        {% elseif route_name == 'entity.user.canonical' or route_name == 'user.page' %}
-          {% set icon_name = 'icon-user-square-rounded' %}
-          {% set system_path = 'user' %}
+        {% set icon_name = item.puzz_icon_name is defined and item.puzz_icon_name ? item.puzz_icon_name : '' %}
+        {% if not icon_name and menu_name == 'account' %}
+          {% set route_name = item.url.isRouted ? item.url.routeName : '' %}
+          {% set url_string = item.url.toString %}
+          {% if route_name == 'user.login' or '/user/login' in url_string %}
+            {% set icon_name = 'icon-login' %}
+          {% elseif route_name == 'user.logout' or '/user/logout' in url_string %}
+            {% set icon_name = 'icon-logout' %}
+          {% elseif route_name == 'entity.user.canonical' or route_name == 'user.page' or '/user' in url_string %}
+            {% set icon_name = 'icon-user-square-rounded' %}
+          {% endif %}
         {% endif %}
 
-        {% if icon_name %}
-          <a href="{{ item.url.toString }}" class="has-inline-icon" data-drupal-link-system-path="{{ system_path }}">
+        {% if puzz_icons_enabled|default(true) and icon_name %}
+          <a href="{{ item.url.toString }}" class="has-inline-icon">
             {{ {
               '#type': 'component',
               '#component': 'puzz:icon',
               '#props': {
                 'name': icon_name,
-                'source': 'sprite',
                 'size': 'lg',
-                'color': 'var(--color-1)'
+                'color': item.puzz_icon_color|default('var(--color-1)')
               }
             } }}
-            <span>{{ item.title }}</span>
+            <span class="has-inline-icon__label">{{ item.title }}</span>
           </a>
         {% else %}
           {{ link(item.title, item.url) }}
         {% endif %}
         {% if item.below %}
-          {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
+          {{ menus.menu_links(item.below, attributes, menu_level + 1, menu_name) }}
         {% endif %}
       </li>
     {% endfor %}

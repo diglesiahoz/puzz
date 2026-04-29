@@ -12,6 +12,7 @@
       const iconsSearch = context.querySelector('.js-puzz-icons-search');
       const iconsGrid = context.querySelector('.js-puzz-icons-grid');
       const iconsIncludeAll = context.querySelector('.js-puzz-icons-include-all');
+      const iconsEnabled = context.querySelector('input[name="icons_enabled"]');
       const iconsCount = context.querySelector('.js-puzz-icons-count');
       const selectedList = context.querySelector('.js-puzz-icons-selected-list');
       const MAX_VISIBLE_ICONS = 300;
@@ -25,6 +26,7 @@
       let prevBtn = null;
       let nextBtn = null;
       let lastResult = { total: 0, shown: 0, page: 1, pages: 1 };
+      let previewSymbols = null;
 
       function getIconItems() {
         if (!iconsGrid) return [];
@@ -62,6 +64,44 @@
           .replaceAll('>', '&gt;')
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
+      }
+
+      async function loadPreviewSymbols() {
+        if (previewSymbols !== null) {
+          return previewSymbols;
+        }
+
+        const adminPreviewSpritePath = (window.drupalSettings && window.drupalSettings.puzz && window.drupalSettings.puzz.icons && window.drupalSettings.puzz.icons.adminPreviewSpritePath)
+          ? window.drupalSettings.puzz.icons.adminPreviewSpritePath
+          : '';
+        if (!adminPreviewSpritePath) {
+          previewSymbols = {};
+          return previewSymbols;
+        }
+
+        try {
+          const response = await fetch(adminPreviewSpritePath, { credentials: 'same-origin' });
+          if (!response.ok) {
+            previewSymbols = {};
+            return previewSymbols;
+          }
+          const text = await response.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, 'image/svg+xml');
+          const symbols = xml.querySelectorAll('symbol[id]');
+          previewSymbols = {};
+          symbols.forEach((symbol) => {
+            const nestedSvg = symbol.querySelector('svg');
+            previewSymbols[symbol.id] = {
+              viewBox: symbol.getAttribute('viewBox') || nestedSvg?.getAttribute('viewBox') || '0 0 24 24',
+              inner: nestedSvg ? nestedSvg.innerHTML : (symbol.innerHTML || ''),
+            };
+          });
+          return previewSymbols;
+        } catch (e) {
+          previewSymbols = {};
+          return previewSymbols;
+        }
       }
 
       function updateIconsCount() {
@@ -287,6 +327,13 @@
           info.className = 'js-puzz-icons-filter-info puzz-icons-filter-info';
           iconsGrid.parentNode.insertBefore(info, iconsGrid);
         }
+        const iconsEnabledActive = !!(iconsEnabled && iconsEnabled.checked);
+        const includeAllActive = !!(iconsIncludeAll && iconsIncludeAll.checked);
+        if (!iconsEnabledActive || includeAllActive) {
+          info.style.display = 'none';
+          return;
+        }
+        info.style.display = '';
         if (matchCount > shownCount) {
           info.textContent = Drupal.t('Showing @shown of @total matched icons. Refine search to narrow results.', {
             '@shown': shownCount,
@@ -300,6 +347,14 @@
       function updatePaginationUI() {
         if (!paginationInfo || !prevBtn || !nextBtn) return;
         const bar = paginationInfo.closest('.js-puzz-icons-pagination');
+        const iconsEnabledActive = !!(iconsEnabled && iconsEnabled.checked);
+        const includeAllActive = !!(iconsIncludeAll && iconsIncludeAll.checked);
+        if (bar) {
+          bar.style.display = (!iconsEnabledActive || includeAllActive) ? 'none' : '';
+        }
+        if (!iconsEnabledActive || includeAllActive) {
+          return;
+        }
         const firstBtn = bar ? bar.querySelector('.js-puzz-icons-first') : null;
         const lastBtn = bar ? bar.querySelector('.js-puzz-icons-last') : null;
         paginationInfo.textContent = Drupal.t('Page @page of @pages', {
@@ -313,11 +368,10 @@
       }
 
       function renderIconPreview(rawName) {
-        const adminPreviewSpritePath = (window.drupalSettings && window.drupalSettings.puzz && window.drupalSettings.puzz.icons && window.drupalSettings.puzz.icons.adminPreviewSpritePath)
-          ? window.drupalSettings.puzz.icons.adminPreviewSpritePath
-          : '';
-        if (adminPreviewSpritePath) {
-          return `<svg class="icon icon--sm"><use href="${adminPreviewSpritePath}#icon-${escapeHtml(rawName)}"></use></svg>`;
+        const key = `icon-${rawName}`;
+        if (previewSymbols && previewSymbols[key]) {
+          const symbol = previewSymbols[key];
+          return `<svg class="icon icon--sm" viewBox="${escapeHtml(symbol.viewBox)}" aria-hidden="true">${symbol.inner}</svg>`;
         }
         return '';
       }
@@ -346,7 +400,17 @@
       }
 
       once('puzz-icons-include-all', '.js-puzz-icons-include-all', context).forEach((checkbox) => {
-        checkbox.addEventListener('change', scheduleIconsUpdate);
+        checkbox.addEventListener('change', () => {
+          filterIcons();
+          scheduleIconsUpdate();
+        });
+      });
+
+      once('puzz-icons-enabled', 'input[name="icons_enabled"]', context).forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+          filterIcons();
+          scheduleIconsUpdate();
+        });
       });
 
       once('puzz-icons-show-selected', '.js-puzz-icons-show-selected', context).forEach((button) => {
@@ -409,6 +473,10 @@
       ensurePaginationUI();
       updateIconsCount();
       filterIcons();
+      loadPreviewSymbols().then(() => {
+        filterIcons();
+        updateIconsCount();
+      });
 
       // Normalize value for comparison (colors lowercase, breakpoints without spaces)
       function normalizeValue(value, isColor) {
