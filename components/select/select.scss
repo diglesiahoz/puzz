@@ -1,0 +1,64 @@
+/**
+ * @file
+ * Select component styles.
+ */
+
+@use '../../src/scss/partials/base/variables' as *;
+
+.puzz-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.puzz-select__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $color-black;
+}
+
+.puzz-select__required-indicator {
+  color: #dc2626;
+  margin-left: 0.2rem;
+}
+
+.puzz-select__field {
+  width: 100%;
+  min-height: 2.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  padding: 0.55rem 0.65rem;
+  color: $color-black;
+  background: $color-white;
+}
+
+.puzz-select__field[multiple] {
+  min-height: 7.5rem;
+}
+
+.puzz-select__field:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+  border-color: #2563eb;
+}
+
+.puzz-select--disabled .puzz-select__field {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.puzz-select__help {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.puzz-select__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b91c1c;
+}
+
+.puzz-select--error .puzz-select__field {
+  border-color: #dc2626;
+}

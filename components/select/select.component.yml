@@ -1,0 +1,33 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Select
+description: Accessible select form control with optgroup support.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/select
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+    label:
+      type: string
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    multiple:
+      type: boolean
+      default: false
+    options:
+      type: array
+    help:
+      type: string
+    error:
+      type: string

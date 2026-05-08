@@ -14,9 +14,6 @@ props:
     caption:
       type: string
       title: Caption
-    heading:
-      type: string
-      title: Heading
     image:
       type: object
       title: Rendered image
@@ -26,10 +23,3 @@ props:
     link_title:
       type: string
       title: Link title
-    label_display:
-      type: string
-      enum: [ above, below, hidden ]
-      default: hidden
-    label_text:
-      type: string
-      title: Label text

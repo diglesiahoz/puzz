@@ -1,0 +1,52 @@
+{#
+/**
+ * @file
+ * Textarea form component template.
+ */
+#}
+
+{% set textarea_id = id is not empty ? id : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-textarea') %}
+{% set rows_value = rows|default(5) %}
+{% set wrapper_classes = [
+  'puzz-textarea',
+  error is not empty ? 'puzz-textarea--error' : '',
+  disabled ? 'puzz-textarea--disabled' : '',
+  required ? 'puzz-textarea--required' : '',
+] %}
+
+{% set described_by_ids = [] %}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([textarea_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([textarea_id ~ '--error']) %}
+{% endif %}
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="{{ wrapper_classes|filter(v => v is not empty)|join(' ') }}">
+  {% if label is not empty %}
+    <label class="puzz-textarea__label" for="{{ textarea_id }}">
+      {{ label }}{% if required %}<span class="puzz-textarea__required-indicator">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <textarea
+    id="{{ textarea_id }}"
+    class="puzz-textarea__field"
+    {% if name is not empty %}name="{{ name }}"{% endif %}
+    rows="{{ rows_value }}"
+    {% if placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
+    {% if required %}required aria-required="true"{% endif %}
+    {% if disabled %}disabled aria-disabled="true"{% endif %}
+    {% if error is not empty %}aria-invalid="true"{% endif %}
+    {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+  >{{ value|default('') }}</textarea>
+
+  {% if help is not empty %}
+    <p id="{{ textarea_id }}--help" class="puzz-textarea__help">{{ help }}</p>
+  {% endif %}
+
+  {% if error is not empty %}
+    <p id="{{ textarea_id }}--error" class="puzz-textarea__error">{{ error }}</p>
+  {% endif %}
+</div>

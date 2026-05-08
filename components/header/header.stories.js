@@ -12,22 +12,13 @@
  * @returns {HTMLElement}
  */
 function renderHeader({
-  heading = 'Welcome to Puzz',
+  caption = 'Welcome to Puzz',
   image = '',
   link_url = '#',
   link_title = 'More',
-  label_display = 'hidden',
-  label_text = '',
 }) {
   const root = document.createElement('div');
   root.className = 'header';
-
-  if (label_display === 'above' && label_text) {
-    const labelAbove = document.createElement('div');
-    labelAbove.className = 'field__label';
-    labelAbove.textContent = label_text;
-    root.appendChild(labelAbove);
-  }
 
   if (image) {
     const media = document.createElement('div');
@@ -36,10 +27,10 @@ function renderHeader({
     root.appendChild(media);
   }
 
-  if (heading) {
+  if (caption) {
     const title = document.createElement('h1');
     title.className = 'header__caption';
-    title.textContent = heading;
+    title.textContent = caption;
     root.appendChild(title);
   }
 
@@ -57,14 +48,31 @@ function renderHeader({
     root.appendChild(actions);
   }
 
-  if (label_display === 'below' && label_text) {
-    const labelBelow = document.createElement('div');
-    labelBelow.className = 'field__label';
-    labelBelow.textContent = label_text;
-    root.appendChild(labelBelow);
-  }
-
   return root;
+}
+
+function toTwigValue(value) {
+  if (typeof value === 'string') {
+    return `'${value.replace(/'/g, "\\'")}'`;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => toTwigValue(item)).join(', ')}]`;
+  }
+  if (value && typeof value === 'object') {
+    const pairs = Object.entries(value).map(([key, item]) => `'${key}': ${toTwigValue(item)}`);
+    return `{ ${pairs.join(', ')} }`;
+  }
+  return "''";
+}
+
+function toTwigComponentCode(componentName, args) {
+  const props = Object.entries(args)
+    .map(([key, value]) => `    '${key}': ${toTwigValue(value)}`);
+  const propsString = props.length > 0 ? `{\n${props.join(',\n')}\n  }` : '{}';
+  return `{{ {\n  '#type': 'component',\n  '#component': '${componentName}',\n  '#props': ${propsString}\n} }}`;
 }
 
 export default {
@@ -75,45 +83,14 @@ export default {
     layout: 'fullscreen',
     docs: {
       source: {
-        transform: (code, storyContext) => {
-          const { args } = storyContext;
-          const props = [];
-
-          if (args.heading !== undefined) {
-            props.push(`'heading': '${String(args.heading).replace(/'/g, "\\'")}'`);
-          }
-          if (args.image !== undefined && args.image !== '') {
-            props.push(`'image': '${String(args.image).replace(/'/g, "\\'")}'`);
-          }
-          if (args.link_url !== undefined && args.link_url !== '') {
-            props.push(`'link_url': '${String(args.link_url).replace(/'/g, "\\'")}'`);
-          }
-          if (args.link_title !== undefined && args.link_title !== '') {
-            props.push(`'link_title': '${String(args.link_title).replace(/'/g, "\\'")}'`);
-          }
-          if (args.label_display !== undefined) {
-            props.push(`'label_display': '${String(args.label_display).replace(/'/g, "\\'")}'`);
-          }
-          if (args.label_text !== undefined && args.label_text !== '') {
-            props.push(`'label_text': '${String(args.label_text).replace(/'/g, "\\'")}'`);
-          }
-          const propsString = props.length > 0
-            ? `{\n    ${props.join(',\n    ')}\n  }`
-            : '{}';
-
-          return `{{ {
-  '#type': 'component',
-  '#component': 'puzz:header',
-  '#props': ${propsString}
-} }}`;
-        },
+        transform: (code, storyContext) => toTwigComponentCode('puzz:header', storyContext.args),
       },
     },
   },
   argTypes: {
-    heading: {
+    caption: {
       control: 'text',
-      description: 'Main title shown over header media.',
+      description: 'Main title shown over header media (mapped from field_puzz_header_caption).',
     },
     image: {
       control: 'text',
@@ -127,23 +104,12 @@ export default {
       control: 'text',
       description: 'CTA label.',
     },
-    label_display: {
-      control: { type: 'select' },
-      options: ['hidden', 'above', 'below'],
-      description: 'Field label display mode.',
-    },
-    label_text: {
-      control: 'text',
-      description: 'Optional label text for above/below display.',
-    },
   },
   args: {
-    heading: 'Build better digital experiences',
+    caption: 'Build better digital experiences',
     image: '<img class="header__image" src="https://picsum.photos/1920/1080?grayscale" alt="Demo header background">',
     link_url: '#',
     link_title: 'Discover more',
-    label_display: 'hidden',
-    label_text: '',
   },
 };
 
@@ -158,19 +124,5 @@ export const WithoutImage = {
 export const WithoutCTA = {
   args: {
     link_url: '',
-  },
-};
-
-export const LabelAbove = {
-  args: {
-    label_display: 'above',
-    label_text: 'Hero label',
-  },
-};
-
-export const LabelBelow = {
-  args: {
-    label_display: 'below',
-    label_text: 'Hero label',
   },
 };

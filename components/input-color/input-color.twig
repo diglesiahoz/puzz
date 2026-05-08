@@ -1,0 +1,47 @@
+{#
+/**
+ * @file
+ * Color input form component template.
+ */
+#}
+
+{% set color_id = id is not empty ? id : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-color') %}
+{% set color_value = value|default('#3b82f6') %}
+{% set described_by_ids = [] %}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([color_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([color_id ~ '--error']) %}
+{% endif %}
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="puzz-input-color{% if error is not empty %} puzz-input-color--error{% endif %}{% if disabled %} puzz-input-color--disabled{% endif %}">
+  {% if label is not empty %}
+    <label class="puzz-input-color__label" for="{{ color_id }}">
+      {{ label }}{% if required %}<span class="puzz-input-color__required-indicator">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <div class="puzz-input-color__control">
+    <input
+      id="{{ color_id }}"
+      class="puzz-input-color__field"
+      type="color"
+      {% if name is not empty %}name="{{ name }}"{% endif %}
+      value="{{ color_value }}"
+      {% if required %}required aria-required="true"{% endif %}
+      {% if disabled %}disabled aria-disabled="true"{% endif %}
+      {% if error is not empty %}aria-invalid="true"{% endif %}
+      {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+    >
+    <code class="puzz-input-color__value">{{ color_value }}</code>
+  </div>
+
+  {% if help is not empty %}
+    <p id="{{ color_id }}--help" class="puzz-input-color__help">{{ help }}</p>
+  {% endif %}
+  {% if error is not empty %}
+    <p id="{{ color_id }}--error" class="puzz-input-color__error">{{ error }}</p>
+  {% endif %}
+</div>

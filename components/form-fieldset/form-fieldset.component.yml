@@ -1,0 +1,31 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Form Fieldset
+description: Reusable fieldset wrapper for grouped form controls.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/form-fieldset
+
+props:
+  type: object
+  properties:
+    legend:
+      type: string
+    description:
+      type: string
+    description_display:
+      type: string
+      enum: [before, after, invisible]
+      default: after
+    required:
+      type: boolean
+      default: false
+    errors:
+      type: string
+    prefix:
+      type: string
+    suffix:
+      type: string
+    children:
+      type: object

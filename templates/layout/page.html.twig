@@ -139,6 +139,303 @@
 
         #}
 
+
+        {#
+        <section>
+          <h2>Formulario de referencia (inventario de componentes)</h2>
+          <p>Ejemplo funcional para identificar todos los componentes de formulario necesarios.</p>
+
+          <form action="#" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Datos personales</legend>
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-text',
+                  'name': 'demo_text',
+                  'label': 'Texto',
+                  'type': 'text',
+                  'placeholder': 'Nombre y apellidos'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-email',
+                  'name': 'demo_email',
+                  'label': 'Email',
+                  'type': 'email',
+                  'placeholder': 'tu@email.com',
+                  'required': true
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-password',
+                  'name': 'demo_password',
+                  'label': 'Password',
+                  'type': 'password',
+                  'required': true
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-tel',
+                  'name': 'demo_tel',
+                  'label': 'Teléfono',
+                  'type': 'tel',
+                  'placeholder': '+34 600 000 000'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-date',
+                  'name': 'demo_date',
+                  'label': 'Fecha',
+                  'type': 'date'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-time',
+                  'name': 'demo_time',
+                  'label': 'Hora',
+                  'type': 'time'
+                }
+              } }}
+            </fieldset>
+
+            <fieldset>
+              <legend>Preferencias</legend>
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:select',
+                '#props': {
+                  'id': 'demo-select',
+                  'name': 'demo_select',
+                  'label': 'Select simple',
+                  'options': [
+                    {'type': 'option', 'value': '', 'label': 'Selecciona una opción', 'selected': true},
+                    {'type': 'option', 'value': 'option_1', 'label': 'Opción 1'},
+                    {'type': 'option', 'value': 'option_2', 'label': 'Opción 2'},
+                    {'type': 'option', 'value': 'option_3', 'label': 'Opción 3'}
+                  ]
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:select',
+                '#props': {
+                  'id': 'demo-multiselect',
+                  'name': 'demo_multiselect[]',
+                  'label': 'Select múltiple',
+                  'multiple': true,
+                  'options': [
+                    {'type': 'option', 'value': 'multi_1', 'label': 'Multi 1', 'selected': true},
+                    {'type': 'option', 'value': 'multi_2', 'label': 'Multi 2'},
+                    {'type': 'option', 'value': 'multi_3', 'label': 'Multi 3'},
+                    {'type': 'option', 'value': 'multi_4', 'label': 'Multi 4', 'selected': true}
+                  ]
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:radio-group',
+                '#props': {
+                  'legend': 'Radio group',
+                  'name': 'demo_radio',
+                  'options': [
+                    {'value': 'a', 'label': 'Opción A', 'checked': true},
+                    {'value': 'b', 'label': 'Opción B'},
+                    {'value': 'c', 'label': 'Opción C'}
+                  ]
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:checkbox-group',
+                '#props': {
+                  'legend': 'Checkbox group',
+                  'name': 'demo_check',
+                  'options': [
+                    {'value': 'news', 'label': 'Newsletter', 'checked': true},
+                    {'value': 'events', 'label': 'Eventos'},
+                    {'value': 'offers', 'label': 'Ofertas'}
+                  ]
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input-range',
+                '#props': {
+                  'id': 'demo-range',
+                  'name': 'demo_range',
+                  'label': 'Range',
+                  'value': '30',
+                  'min': '0',
+                  'max': '100',
+                  'step': '1'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input-color',
+                '#props': {
+                  'id': 'demo-color',
+                  'name': 'demo_color',
+                  'label': 'Color',
+                  'value': '#0ea5e9'
+                }
+              } }}
+            </fieldset>
+
+            <fieldset>
+              <legend>Contenido y adjuntos</legend>
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:textarea',
+                '#props': {
+                  'id': 'demo-textarea',
+                  'name': 'demo_textarea',
+                  'label': 'Textarea',
+                  'rows': 5,
+                  'placeholder': 'Escribe tu mensaje...'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:file-input',
+                '#props': {
+                  'id': 'demo-file',
+                  'name': 'demo_file',
+                  'label': 'File upload'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:file-input',
+                '#props': {
+                  'id': 'demo-files',
+                  'name': 'demo_files[]',
+                  'label': 'Multiple files',
+                  'multiple': true
+                }
+              } }}
+            </fieldset>
+
+            <fieldset>
+              <legend>Campos avanzados</legend>
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-search',
+                  'name': 'demo_search',
+                  'label': 'Search',
+                  'type': 'search',
+                  'placeholder': 'Buscar...'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-url',
+                  'name': 'demo_url',
+                  'label': 'URL',
+                  'type': 'url',
+                  'placeholder': 'https://example.com'
+                }
+              } }}
+
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:input',
+                '#props': {
+                  'id': 'demo-number',
+                  'name': 'demo_number',
+                  'label': 'Number',
+                  'type': 'number',
+                  'min': '0',
+                  'max': '999',
+                  'step': '1',
+                  'value': '10'
+                }
+              } }}
+
+              <div>
+                <label for="demo-hidden-label">Hidden (no visible)</label>
+                <input id="demo-hidden-label" name="demo_hidden_label" type="hidden" value="hidden-value">
+                <small>Campo hidden enviado en el submit.</small>
+              </div>
+            </fieldset>
+
+            <div>
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:cta',
+                '#props': {
+                  'text': 'Submit',
+                  'url': '',
+                  'variant': 'primary',
+                  'size': 'medium',
+                  'button_type': 'submit'
+                }
+              } }}
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:cta',
+                '#props': {
+                  'text': 'Reset',
+                  'url': '',
+                  'variant': 'outline',
+                  'size': 'medium',
+                  'button_type': 'reset'
+                }
+              } }}
+              {{ {
+                '#type': 'component',
+                '#component': 'puzz:cta',
+                '#props': {
+                  'text': 'Secondary action',
+                  'url': '',
+                  'variant': 'secondary',
+                  'size': 'medium',
+                  'button_type': 'button'
+                }
+              } }}
+            </div>
+          </form>
+        </section>
+        #}
+
       </main>
 
       {% if page.sidebar_second %}

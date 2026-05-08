@@ -12,6 +12,9 @@ Componente de campo de texto accesible. Renderiza un `<input>` con etiqueta visi
 | `label`       | string  | —           | Texto visible de la etiqueta.                       |
 | `value`       | string  | —           | Valor actual.                                       |
 | `placeholder` | string  | —           | Texto de marcador cuando el campo está vacío.      |
+| `min`         | string  | —           | Valor mínimo para `type=number` y tipos compatibles. |
+| `max`         | string  | —           | Valor máximo para `type=number` y tipos compatibles. |
+| `step`        | string  | —           | Incremento para `type=number` y tipos compatibles. |
 | `required`    | boolean | `false`     | Indica si el campo es obligatorio.                  |
 | `disabled`    | boolean | `false`     | Indica si el campo está deshabilitado.              |
 | `error`       | string  | —           | Mensaje de error de validación.                     |
@@ -67,6 +70,24 @@ Se consideran “texto” y se renderizan con este componente: `text`, `email`, 
     'type': 'email',
     'value': 'no-es-un-email',
     'error': 'Introduce una dirección de correo válida.',
+  }
+} }}
+```
+
+### Number con límites
+
+```twig
+{{ {
+  '#type': 'component',
+  '#component': 'puzz:input',
+  '#props': {
+    'name': 'quantity',
+    'label': 'Quantity',
+    'type': 'number',
+    'min': '0',
+    'max': '999',
+    'step': '1',
+    'value': '10'
   }
 } }}
 ```

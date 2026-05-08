@@ -1,0 +1,62 @@
+{#
+/**
+ * @file
+ * Select form component template.
+ */
+#}
+
+{% set select_id = id is not empty ? id : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-select') %}
+{% set wrapper_classes = [
+  'puzz-select',
+  error is not empty ? 'puzz-select--error' : '',
+  disabled ? 'puzz-select--disabled' : '',
+  required ? 'puzz-select--required' : '',
+] %}
+
+{% set described_by_ids = [] %}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([select_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([select_id ~ '--error']) %}
+{% endif %}
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="{{ wrapper_classes|filter(v => v is not empty)|join(' ') }}">
+  {% if label is not empty %}
+    <label class="puzz-select__label" for="{{ select_id }}">
+      {{ label }}{% if required %}<span class="puzz-select__required-indicator">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <select
+    id="{{ select_id }}"
+    class="puzz-select__field"
+    {% if name is not empty %}name="{{ name }}"{% endif %}
+    {% if multiple %}multiple{% endif %}
+    {% if required %}required aria-required="true"{% endif %}
+    {% if disabled %}disabled aria-disabled="true"{% endif %}
+    {% if error is not empty %}aria-invalid="true"{% endif %}
+    {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+  >
+    {% for option in options|default([]) %}
+      {% if option.type|default('option') == 'optgroup' %}
+        <optgroup label="{{ option.label|default('') }}">
+          {% for sub_option in option.options|default([]) %}
+            <option value="{{ sub_option.value|default('') }}"{% if sub_option.selected|default(false) %} selected="selected"{% endif %}>{{ sub_option.label|default('') }}</option>
+          {% endfor %}
+        </optgroup>
+      {% else %}
+        <option value="{{ option.value|default('') }}"{% if option.selected|default(false) %} selected="selected"{% endif %}>{{ option.label|default('') }}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+
+  {% if help is not empty %}
+    <p id="{{ select_id }}--help" class="puzz-select__help">{{ help }}</p>
+  {% endif %}
+
+  {% if error is not empty %}
+    <p id="{{ select_id }}--error" class="puzz-select__error">{{ error }}</p>
+  {% endif %}
+</div>

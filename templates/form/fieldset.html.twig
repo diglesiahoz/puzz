@@ -26,44 +26,52 @@
  * @see template_preprocess_fieldset()
  */
 #}
-{%
-  set classes = [
-    'js-form-item',
-    'form-item',
-    'js-form-wrapper',
-    'form-wrapper',
-  ]
-%}
-<fieldset{{ attributes.addClass(classes) }}>
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:form-fieldset',
+    '#props': props
+  } }}
+{% else %}
   {%
-    set legend_span_classes = [
-      'fieldset-legend',
-      required ? 'js-form-required',
-      required ? 'form-required',
+    set classes = [
+      'js-form-item',
+      'form-item',
+      'js-form-wrapper',
+      'form-wrapper',
     ]
   %}
-  {# Always wrap fieldset legends in a <span> for CSS positioning. #}
-  <legend{{ legend.attributes }}>
-    <span{{ legend_span.attributes.addClass(legend_span_classes) }}>{{ legend.title }}</span>
-  </legend>
-  <div class="fieldset-wrapper">
-    {% if description_display == 'before' and description.content %}
-      <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
-    {% endif %}
-    {% if errors %}
-      <div class="form-item--error-message">
-        <strong>{{ errors }}</strong>
-      </div>
-    {% endif %}
-    {% if prefix %}
-      <span class="field-prefix">{{ prefix }}</span>
-    {% endif %}
-    {{ children }}
-    {% if suffix %}
-      <span class="field-suffix">{{ suffix }}</span>
-    {% endif %}
-    {% if description_display in ['after', 'invisible'] and description.content %}
-      <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
-    {% endif %}
-  </div>
-</fieldset>
+  <fieldset{{ attributes.addClass(classes) }}>
+    {%
+      set legend_span_classes = [
+        'fieldset-legend',
+        required ? 'js-form-required',
+        required ? 'form-required',
+      ]
+    %}
+    {# Always wrap fieldset legends in a <span> for CSS positioning. #}
+    <legend{{ legend.attributes }}>
+      <span{{ legend_span.attributes.addClass(legend_span_classes) }}>{{ legend.title }}</span>
+    </legend>
+    <div class="fieldset-wrapper">
+      {% if description_display == 'before' and description.content %}
+        <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
+      {% endif %}
+      {% if errors %}
+        <div class="form-item--error-message">
+          <strong>{{ errors }}</strong>
+        </div>
+      {% endif %}
+      {% if prefix %}
+        <span class="field-prefix">{{ prefix }}</span>
+      {% endif %}
+      {{ children }}
+      {% if suffix %}
+        <span class="field-suffix">{{ suffix }}</span>
+      {% endif %}
+      {% if description_display in ['after', 'invisible'] and description.content %}
+        <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
+      {% endif %}
+    </div>
+  </fieldset>
+{% endif %}

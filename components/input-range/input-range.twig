@@ -1,0 +1,50 @@
+{#
+/**
+ * @file
+ * Range input form component template.
+ */
+#}
+
+{% set range_id = id is not empty ? id : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-range') %}
+{% set range_value = value|default('0') %}
+{% set described_by_ids = [] %}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([range_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([range_id ~ '--error']) %}
+{% endif %}
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="puzz-input-range{% if error is not empty %} puzz-input-range--error{% endif %}{% if disabled %} puzz-input-range--disabled{% endif %}">
+  {% if label is not empty %}
+    <label class="puzz-input-range__label" for="{{ range_id }}">
+      {{ label }}{% if required %}<span class="puzz-input-range__required-indicator">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <div class="puzz-input-range__control">
+    <input
+      id="{{ range_id }}"
+      class="puzz-input-range__field"
+      type="range"
+      {% if name is not empty %}name="{{ name }}"{% endif %}
+      value="{{ range_value }}"
+      {% if min is not empty %}min="{{ min }}"{% endif %}
+      {% if max is not empty %}max="{{ max }}"{% endif %}
+      {% if step is not empty %}step="{{ step }}"{% endif %}
+      {% if required %}required aria-required="true"{% endif %}
+      {% if disabled %}disabled aria-disabled="true"{% endif %}
+      {% if error is not empty %}aria-invalid="true"{% endif %}
+      {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+    >
+    <output class="puzz-input-range__value">{{ range_value }}</output>
+  </div>
+
+  {% if help is not empty %}
+    <p id="{{ range_id }}--help" class="puzz-input-range__help">{{ help }}</p>
+  {% endif %}
+  {% if error is not empty %}
+    <p id="{{ range_id }}--error" class="puzz-input-range__error">{{ error }}</p>
+  {% endif %}
+</div>

@@ -1,0 +1,50 @@
+/**
+ * @file
+ * Checkbox group component styles.
+ */
+
+.puzz-checkbox-group {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  margin: 0;
+}
+
+.puzz-checkbox-group__legend {
+  font-size: 0.94rem;
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+.puzz-checkbox-group__required-indicator {
+  color: #dc2626;
+  margin-left: 0.2rem;
+}
+
+.puzz-checkbox-group__items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.puzz-checkbox-group__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.puzz-checkbox-group__help {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.puzz-checkbox-group__error {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  color: #b91c1c;
+}
+
+.puzz-checkbox-group--error {
+  border-color: #dc2626;
+}

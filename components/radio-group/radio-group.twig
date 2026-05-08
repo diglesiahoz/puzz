@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Radio group form component template.
+ */
+#}
+
+{% set has_children = children is not empty %}
+<fieldset class="puzz-radio-group{% if error is not empty %} puzz-radio-group--error{% endif %}{% if disabled %} puzz-radio-group--disabled{% endif %}">
+  {% if legend is not empty %}
+    <legend class="puzz-radio-group__legend">
+      {{ legend }}{% if required %}<span class="puzz-radio-group__required-indicator">*</span>{% endif %}
+    </legend>
+  {% endif %}
+
+  <div class="puzz-radio-group__items">
+    {% if has_children %}
+      {{ children }}
+    {% else %}
+      {% for option in options|default([]) %}
+        <label class="puzz-radio-group__option">
+          <input
+            type="radio"
+            class="puzz-radio-group__field"
+            {% if name is not empty %}name="{{ name }}"{% endif %}
+            value="{{ option.value|default('') }}"
+            {% if option.checked|default(false) %}checked{% endif %}
+            {% if disabled or option.disabled|default(false) %}disabled{% endif %}
+          >
+          <span>{{ option.label|default('') }}</span>
+        </label>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if help is not empty %}
+    <p class="puzz-radio-group__help">{{ help }}</p>
+  {% endif %}
+  {% if error is not empty %}
+    <p class="puzz-radio-group__error">{{ error }}</p>
+  {% endif %}
+</fieldset>

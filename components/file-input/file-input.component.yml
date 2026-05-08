@@ -1,0 +1,33 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: File Input
+description: Accessible file input control (single or multiple).
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/file-input
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+    label:
+      type: string
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    multiple:
+      type: boolean
+      default: false
+    accept:
+      type: string
+    help:
+      type: string
+    error:
+      type: string

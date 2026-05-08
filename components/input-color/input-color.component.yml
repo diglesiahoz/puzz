@@ -1,0 +1,30 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Input Color
+description: Accessible color picker input control.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/input-color
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+    label:
+      type: string
+    value:
+      type: string
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    help:
+      type: string
+    error:
+      type: string

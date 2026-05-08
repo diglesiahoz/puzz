@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Checkbox group form component template.
+ */
+#}
+
+{% set has_children = children is not empty %}
+<fieldset class="puzz-checkbox-group{% if error is not empty %} puzz-checkbox-group--error{% endif %}{% if disabled %} puzz-checkbox-group--disabled{% endif %}">
+  {% if legend is not empty %}
+    <legend class="puzz-checkbox-group__legend">
+      {{ legend }}{% if required %}<span class="puzz-checkbox-group__required-indicator">*</span>{% endif %}
+    </legend>
+  {% endif %}
+
+  <div class="puzz-checkbox-group__items">
+    {% if has_children %}
+      {{ children }}
+    {% else %}
+      {% for option in options|default([]) %}
+        <label class="puzz-checkbox-group__option">
+          <input
+            type="checkbox"
+            class="puzz-checkbox-group__field"
+            {% if name is not empty %}name="{{ name }}[]"{% endif %}
+            value="{{ option.value|default('') }}"
+            {% if option.checked|default(false) %}checked{% endif %}
+            {% if disabled or option.disabled|default(false) %}disabled{% endif %}
+          >
+          <span>{{ option.label|default('') }}</span>
+        </label>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if help is not empty %}
+    <p class="puzz-checkbox-group__help">{{ help }}</p>
+  {% endif %}
+  {% if error is not empty %}
+    <p class="puzz-checkbox-group__error">{{ error }}</p>
+  {% endif %}
+</fieldset>

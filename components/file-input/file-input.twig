@@ -1,0 +1,44 @@
+{#
+/**
+ * @file
+ * File input form component template.
+ */
+#}
+
+{% set file_id = id is not empty ? id : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-file') %}
+{% set described_by_ids = [] %}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([file_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([file_id ~ '--error']) %}
+{% endif %}
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="puzz-file-input{% if error is not empty %} puzz-file-input--error{% endif %}{% if disabled %} puzz-file-input--disabled{% endif %}">
+  {% if label is not empty %}
+    <label class="puzz-file-input__label" for="{{ file_id }}">
+      {{ label }}{% if required %}<span class="puzz-file-input__required-indicator">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <input
+    id="{{ file_id }}"
+    class="puzz-file-input__field"
+    type="file"
+    {% if name is not empty %}name="{{ name }}"{% endif %}
+    {% if multiple %}multiple{% endif %}
+    {% if accept is not empty %}accept="{{ accept }}"{% endif %}
+    {% if required %}required aria-required="true"{% endif %}
+    {% if disabled %}disabled aria-disabled="true"{% endif %}
+    {% if error is not empty %}aria-invalid="true"{% endif %}
+    {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+  >
+
+  {% if help is not empty %}
+    <p id="{{ file_id }}--help" class="puzz-file-input__help">{{ help }}</p>
+  {% endif %}
+  {% if error is not empty %}
+    <p id="{{ file_id }}--error" class="puzz-file-input__error">{{ error }}</p>
+  {% endif %}
+</div>

@@ -54,6 +54,18 @@ props:
       type: string
       title: Placeholder
       description: Placeholder text displayed when empty.
+    min:
+      type: string
+      title: Min
+      description: Minimum value for numeric/date-like fields.
+    max:
+      type: string
+      title: Max
+      description: Maximum value for numeric/date-like fields.
+    step:
+      type: string
+      title: Step
+      description: Step value for numeric/date-like fields.
     required:
       type: boolean
       title: Required

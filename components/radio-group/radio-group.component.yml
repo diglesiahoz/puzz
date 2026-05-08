@@ -1,0 +1,30 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Radio Group
+description: Group of radio controls with legend, help and error states.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/radio-group
+
+props:
+  type: object
+  properties:
+    legend:
+      type: string
+    name:
+      type: string
+    options:
+      type: array
+    children:
+      type: object
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    help:
+      type: string
+    error:
+      type: string

@@ -1,0 +1,36 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Input Range
+description: Accessible range slider control.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/input-range
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+    label:
+      type: string
+    value:
+      type: string
+    min:
+      type: string
+    max:
+      type: string
+    step:
+      type: string
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    help:
+      type: string
+    error:
+      type: string

@@ -10,4 +10,12 @@
  * @see template_preprocess_radios()
  */
 #}
-<div{{ attributes.addClass('form-radios') }}>{{ children }}</div>
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:radio-group',
+    '#props': props
+  } }}
+{% else %}
+  <div{{ attributes.addClass('form-radios') }}>{{ children }}</div>
+{% endif %}

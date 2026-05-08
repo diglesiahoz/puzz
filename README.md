@@ -238,6 +238,79 @@ Si falla la regeneración al guardar:
 - verificar que `admin-preview-sprite.svg` existe y es legible;
 - revisar log de Drupal (`watchdog` / `Recent log messages`).
 
+## 🧾 Sistema de Formularios (SDC)
+
+El tema ya incluye una capa de componentes para formularios y mapeo automático desde plantillas `templates/form/*.twig`.
+
+### Catálogo actual de componentes de formulario
+
+- `puzz:input` (text, email, password, search, tel, url, number con `min/max/step`)
+- `puzz:textarea`
+- `puzz:select` (simple + multiple + optgroup)
+- `puzz:checkbox`
+- `puzz:checkbox-group`
+- `puzz:radio-group`
+- `puzz:file-input`
+- `puzz:input-range`
+- `puzz:input-color`
+- `puzz:form-fieldset`
+- `puzz:cta` (botones de acción / submit)
+
+### Integración automática con Form API
+
+Archivos clave:
+- `includes/preprocess.input.inc`
+- `includes/preprocess.select.inc`
+- `includes/preprocess.textarea.inc`
+- `includes/preprocess.checkboxes.inc`
+- `includes/preprocess.radios.inc`
+- `includes/preprocess.fieldset.inc`
+- `includes/preprocess.form_element.inc`
+
+Mapeo principal:
+- `input[type=text|email|password|search|tel|url|number]` -> `puzz:input`
+- `input[type=file]` -> `puzz:file-input`
+- `input[type=checkbox]` -> `puzz:checkbox`
+- `input[type=range]` -> `puzz:input-range`
+- `input[type=color]` -> `puzz:input-color`
+- `select` -> `puzz:select`
+- `textarea` -> `puzz:textarea`
+- `checkboxes` -> `puzz:checkbox-group`
+- `radios` -> `puzz:radio-group`
+- `fieldset` -> `puzz:form-fieldset`
+- `input[type=submit]` -> `puzz:cta` (`button_type: submit`)
+
+### Sobrescribir componente desde Form API
+
+Puedes forzar componente o props en el elemento:
+
+```php
+$form['my_field']['#component'] = 'puzz:input';
+$form['my_field']['#component_props'] = [
+  'help' => 'Custom help text',
+];
+```
+
+### Storybook (formularios)
+
+Cada componente tiene historias en su carpeta:
+- `components/input/*.stories.js`
+- `components/textarea/*.stories.js`
+- `components/select/*.stories.js`
+- `components/checkbox/*.stories.js`
+- `components/checkbox-group/*.stories.js`
+- `components/radio-group/*.stories.js`
+- `components/file-input/*.stories.js`
+- `components/input-range/*.stories.js`
+- `components/input-color/*.stories.js`
+- `components/form-fieldset/*.stories.js`
+
+Ejecuta:
+
+```bash
+npm run storybook
+```
+
 ### Modos de Compilación
 
 **Modo Desarrollo (`build:dev`):**
@@ -317,7 +390,7 @@ npm run build:prod  # Modo producción (minificado, sin source maps)
 `hook_library_info_alter()` en `puzz.theme` detecta componentes en `build/components/` y registra automáticamente una librería por cada uno:
 
 - `puzz/cta` → incluye `build/components/cta/cta.css` y `cta.js`
-- `puzz/button` → incluye `build/components/button/button.css` y `button.js`
+- `puzz/header` → incluye `build/components/header/header.css` y `header.js`
 
 ### 3. Asociación Automática
 
@@ -346,13 +419,14 @@ Cuando renderizas un componente:
   }
 } }}
 
-{# Componente Button #}
+{# Componente Header #}
 {{ {
   '#type': 'component',
-  '#component': 'puzz:button',
+  '#component': 'puzz:header',
   '#props': {
-    'text': 'Enviar',
-    'type': 'submit'
+    'caption': 'Welcome to Puzz',
+    'link_url': '#',
+    'link_title': 'Learn more'
   }
 } }}
 ```
@@ -365,12 +439,28 @@ Drupal automáticamente:
 
 ## 🧩 Componentes SDC
 
+### Índice rápido de componentes
+
+- [CTA](components/cta/README.md)
+- [Input](components/input/README.md)
+- [Textarea](components/textarea/README.md)
+- [Select](components/select/README.md)
+- [Checkbox](components/checkbox/README.md)
+- [Checkbox Group](components/checkbox-group/README.md)
+- [Radio Group](components/radio-group/README.md)
+- [File Input](components/file-input/README.md)
+- [Input Range](components/input-range/README.md)
+- [Input Color](components/input-color/README.md)
+- [Form Fieldset](components/form-fieldset/README.md)
+- [Header](components/header/README.md)
+- [Section](components/section/README.md)
+
 ### Estructura de Componentes
 
 Los componentes están organizados directamente en `components/`:
 - Cada componente tiene su propio directorio
 - Ejemplo: `components/cta/` → `puzz:cta`
-- Ejemplo: `components/button/` → `puzz:button`
+- Ejemplo: `components/header/` → `puzz:header`
 
 ### Estructura de Archivos de Componente
 
@@ -392,7 +482,7 @@ components/{nombre}/
 
 Los componentes se referencian usando el nombre del directorio:
 - `components/cta/` → ID del componente: `cta` → Referencia: `puzz:cta`
-- `components/button/` → ID del componente: `button` → Referencia: `puzz:button`
+- `components/header/` → ID del componente: `header` → Referencia: `puzz:header`
 
 ### Ejemplo: Crear un Nuevo Componente
 
@@ -469,21 +559,21 @@ props:
 
 ## 📄 Párrafos en view mode "component"
 
-Los tipos de párrafo del ecosistema **puzz_component** (Section, Background image, etc.) se renderizan en el tema cuando usan el view mode **"component"**. El tema no altera el build en los módulos; toda la lógica de render está en el tema.
+Los tipos de párrafo del ecosistema **puzz_component** (por ejemplo `puzz_section`, `puzz_header`) se renderizan en el tema cuando usan el view mode **"component"**. El tema no altera el build en los módulos; toda la lógica de render está en el tema.
 
 ### Flujo
 
-1. **Preprocess** (`includes/preprocess.paragraph.inc`): para cada párrafo en view mode `component`, según el bundle (section, background_image, …) se rellenan `component`, `props` y, si aplica, `label_display` y `label_text` desde el Manage display.
+1. **Preprocess** (`includes/preprocess.paragraph.inc`): para cada párrafo en view mode `component`, según el bundle se rellenan `component` y `props`.
 2. **Plantilla de párrafo**: `paragraph--{bundle}--component.html.twig` solo invoca el componente SDC con esas props (`#type` => `component`, `#component`, `#props`). Si no hay `component`/`props`, se hace fallback a `{{ content }}`.
-3. **Componente SDC**: el componente del tema (p. ej. `puzz:section`, `puzz:background_image`) recibe las props y, si vienen `label_display` y `label_text`, pinta el label (above/below) él mismo.
+3. **Componente SDC**: el componente del tema (p. ej. `puzz:section`, `puzz:header`) recibe las props y renderiza su estructura.
 
 ### Archivos implicados
 
 | Rol | Archivo |
 |-----|--------|
-| Preprocess | `includes/preprocess.paragraph.inc` → `_puzz_paragraph_section_component()`, `_puzz_paragraph_background_image_component()` |
-| Plantillas párrafo | `templates/paragraph/paragraph--section--component.html.twig`, `paragraph--background_image--component.html.twig` |
-| Componentes | `components/section/section.twig`, `components/background_image/background_image.twig` |
+| Preprocess | `includes/preprocess.paragraph.inc` → `_puzz_paragraph_section_component()`, `_puzz_paragraph_header_component()` |
+| Plantillas párrafo | `templates/paragraph/paragraph--puzz-section.html.twig`, `paragraph--puzz-header.html.twig` |
+| Componentes | `components/section/section.twig`, `components/header/header.twig` |
 
 ### Patrón unificado
 
@@ -501,14 +591,14 @@ Todas las plantillas de párrafo en view mode component siguen el mismo patrón 
 {% endif %}
 ```
 
-El **label del Manage display** (above/below/hidden) se pasa en props (`label_display`, `label_text`) y lo renderiza el propio componente, no la plantilla del párrafo.
+Nota: las props dependen de cada componente. Por ejemplo, en `puzz:header` el título principal se pasa como `caption` (mapeado desde `field_puzz_header_caption`).
 
 ### Añadir un nuevo tipo de párrafo "component"
 
 1. En el módulo: definir el paragraph type, campos y displays (view mode "component").
-2. En el tema: en `preprocess.paragraph.inc`, añadir `elseif ($paragraph->bundle() === 'mi_tipo')` y una función `_puzz_paragraph_mi_tipo_component($variables, $paragraph)` que rellene `$variables['component']`, `$variables['props']` y, si quieres label, `label_display` y `label_text` desde el display.
+2. En el tema: en `preprocess.paragraph.inc`, añadir `elseif ($paragraph->bundle() === 'mi_tipo')` y una función `_puzz_paragraph_mi_tipo_component($variables, $paragraph)` que rellene `$variables['component']` y `$variables['props']`.
 3. En el tema: crear `templates/paragraph/paragraph--mi-tipo--component.html.twig` con el mismo bloque de arriba (sustituyendo `puzz:nombre_componente` por el ID del componente).
-4. En el componente: si usa label, en el `.twig` del componente pintar `field__label` above/below según las props.
+4. En el componente: en el `.twig` del componente renderizar solo las props definidas para ese bundle.
 
 ## 🔧 Configuración
 
@@ -788,26 +878,42 @@ components/
     └── cta.stories.js  ← Story del componente
 ```
 
-#### Estructura de una Story con Twig
+#### Estructura de una Story y snippet Twig
 
-**Importante:** Storybook renderiza los componentes usando los **templates Twig reales**, asegurando consistencia total entre Storybook y Drupal.
+**Importante:** en este tema las stories pueden renderizarse con DOM JS y, en documentación, exponen un snippet Twig de uso mediante `parameters.docs.source.transform`.
 
 ```javascript
 /**
  * @file
  * CTA component stories.
- * Uses the actual Twig template (cta.twig) for rendering.
+ * Story renders a preview and exposes Twig usage in Docs.
  * 
  * Note: Component CSS is loaded automatically in .storybook/preview.js
  */
 
-import { createTwigRenderer } from '../../.storybook/twig-loader.js';
-
 export default {
   title: 'Puzz/CTA',
   tags: ['autodocs'],
-  // Usa el renderer de Twig que compila el template real
-  render: createTwigRenderer('cta'),
+  render: (args) => renderCTA(args),
+  parameters: {
+    docs: {
+      source: {
+        transform: (code, storyContext) => {
+          const { args } = storyContext;
+          return `{{ {
+  '#type': 'component',
+  '#component': 'puzz:cta',
+  '#props': {
+    'text': '${args.text}',
+    'url': '${args.url}',
+    'variant': '${args.variant}',
+    'size': '${args.size}'
+  }
+} }}`;
+        },
+      },
+    },
+  },
   argTypes: {
     text: {
       control: 'text',
@@ -846,26 +952,21 @@ export const Primary = {
 };
 ```
 
-#### Cómo Funciona el Renderer de Twig
+#### Cómo se muestra Twig en Docs
 
-El helper `createTwigRenderer()` hace lo siguiente:
+El bloque de ejemplo Twig se genera en cada story con:
 
-1. **Carga el template Twig real** (`components/{nombre}/{nombre}.twig`)
-2. **Compila el template** con los props proporcionados
-3. **Soporta sintaxis Twig básica**:
-   - `{% set %}` para definir variables
-   - `{% if %}` / `{% else %}` / `{% endif %}` para condicionales
-   - `{{ variable }}` para interpolación
-   - Filtros como `|default()`, `|join()`
-   - Concatenación con `~`
+1. `parameters.docs.source.transform`
+2. lectura de `storyContext.args`
+3. construcción del render array `#type/#component/#props`
 
 #### Características Importantes
 
-1. **Templates Reales**: Los componentes se renderizan usando los mismos templates Twig que Drupal, garantizando consistencia total.
+1. **Snippet útil**: El bloque Twig mostrado en Docs es copiable y refleja los args de la story.
 
 2. **CSS Automático**: El CSS del componente se carga automáticamente vía `preview.js`, no necesitas importarlo manualmente.
 
-3. **Props**: Los argumentos (`args`) deben coincidir con las props definidas en el `.component.yml` y el template Twig.
+3. **Props**: Los argumentos (`args`) deben coincidir con las props definidas en el `.component.yml`.
 
 4. **Documentación**: Usa `tags: ['autodocs']` para generar documentación automática.
 
@@ -873,7 +974,7 @@ El helper `createTwigRenderer()` hace lo siguiente:
 
 #### Ventajas de Usar Twig en Storybook
 
-- ✅ **Consistencia**: El mismo template se usa en Storybook y Drupal
+- ✅ **Consistencia de uso**: El snippet Twig mostrado en Storybook coincide con el API de props del componente
 - ✅ **Mantenibilidad**: Un solo lugar para mantener el template
 - ✅ **Precisión**: El HTML renderizado coincide exactamente con Drupal
 - ✅ **Profesionalismo**: Muestra el código real usado en producción

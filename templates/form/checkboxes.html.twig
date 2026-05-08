@@ -12,4 +12,12 @@
  @todo: remove this file once https://www.drupal.org/node/1819284 is resolved.
  This is identical to core/modules/system/templates/container.html.twig
 #}
-<div{{ attributes.addClass('form-checkboxes') }}>{{ children }}</div>
+{% if component is defined and props is defined %}
+  {{ {
+    '#type': 'component',
+    '#component': component ?? 'puzz:checkbox-group',
+    '#props': props
+  } }}
+{% else %}
+  <div{{ attributes.addClass('form-checkboxes') }}>{{ children }}</div>
+{% endif %}

@@ -27,6 +27,12 @@ function puzz_preprocess_form_element(array &$variables): void {
     'tel',
     'url',
     'number',
+    'select',
+    'textarea',
+    'checkboxes',
+    'radios',
+    'checkbox',
+    'managed_file',
   ];
 
   if (empty($element['#type']) || !in_array($element['#type'], $text_types, TRUE)) {

@@ -1,0 +1,35 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Textarea
+description: Accessible textarea form control.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/textarea
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+    label:
+      type: string
+    value:
+      type: string
+    rows:
+      type: number
+      default: 5
+    placeholder:
+      type: string
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    help:
+      type: string
+    error:
+      type: string

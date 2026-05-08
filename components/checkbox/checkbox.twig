@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * Checkbox form component template.
+ */
+#}
+
+{% set checkbox_id = id is not empty ? id : (name is not empty ? 'edit-' ~ name|replace({'_': '-'}) : 'edit-checkbox') %}
+{% set described_by_ids = [] %}
+{% if help is not empty %}
+  {% set described_by_ids = described_by_ids|merge([checkbox_id ~ '--help']) %}
+{% endif %}
+{% if error is not empty %}
+  {% set described_by_ids = described_by_ids|merge([checkbox_id ~ '--error']) %}
+{% endif %}
+{% set described_by_attr = described_by_ids ? described_by_ids|join(' ') : null %}
+
+<div class="puzz-checkbox{% if error is not empty %} puzz-checkbox--error{% endif %}{% if disabled %} puzz-checkbox--disabled{% endif %}">
+  <label class="puzz-checkbox__label" for="{{ checkbox_id }}">
+    <input
+      id="{{ checkbox_id }}"
+      class="puzz-checkbox__field"
+      type="checkbox"
+      {% if name is not empty %}name="{{ name }}"{% endif %}
+      {% if value is not empty %}value="{{ value }}"{% endif %}
+      {% if checked %}checked{% endif %}
+      {% if required %}required aria-required="true"{% endif %}
+      {% if disabled %}disabled aria-disabled="true"{% endif %}
+      {% if error is not empty %}aria-invalid="true"{% endif %}
+      {% if described_by_attr %}aria-describedby="{{ described_by_attr }}"{% endif %}
+    >
+    <span class="puzz-checkbox__text">{{ label|default('') }}</span>
+  </label>
+
+  {% if help is not empty %}
+    <p id="{{ checkbox_id }}--help" class="puzz-checkbox__help">{{ help }}</p>
+  {% endif %}
+  {% if error is not empty %}
+    <p id="{{ checkbox_id }}--error" class="puzz-checkbox__error">{{ error }}</p>
+  {% endif %}
+</div>

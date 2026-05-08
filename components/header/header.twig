@@ -5,18 +5,14 @@
  */
 #}
 <div class="header">
-  {% if label_display|default('hidden') == 'above' and label_text|default('') is not empty %}
-    <div class="field__label">{{ label_text }}</div>
-  {% endif %}
-
   {% if image is not empty %}
     <div class="header__media">
       {{ image }}
     </div>
   {% endif %}
 
-  {% if heading is not empty %}
-    <h1 class="header__caption">{{ heading }}</h1>
+  {% if caption is not empty %}
+    <h1 class="header__caption">{{ caption }}</h1>
   {% endif %}
 
   {% if link_url is not empty %}
@@ -34,9 +30,5 @@
         '#props': props
       } }}
     </div>
-  {% endif %}
-
-  {% if label_display|default('hidden') == 'below' and label_text|default('') is not empty %}
-    <div class="field__label">{{ label_text }}</div>
   {% endif %}
 </div>

@@ -8,6 +8,11 @@
 // Load preprocess logic split into separate include files.
 require_once __DIR__ . '/includes/preprocess.input.inc';
 require_once __DIR__ . '/includes/preprocess.form_element.inc';
+require_once __DIR__ . '/includes/preprocess.select.inc';
+require_once __DIR__ . '/includes/preprocess.textarea.inc';
+require_once __DIR__ . '/includes/preprocess.checkboxes.inc';
+require_once __DIR__ . '/includes/preprocess.radios.inc';
+require_once __DIR__ . '/includes/preprocess.fieldset.inc';
 require_once __DIR__ . '/includes/preprocess.paragraph.inc';
 
 /**

@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Form fieldset wrapper component template.
+ */
+#}
+
+<fieldset class="puzz-form-fieldset">
+  {% if legend is not empty %}
+    <legend class="puzz-form-fieldset__legend">
+      {{ legend }}{% if required %}<span class="puzz-form-fieldset__required-indicator">*</span>{% endif %}
+    </legend>
+  {% endif %}
+
+  <div class="puzz-form-fieldset__wrapper">
+    {% if description_display == 'before' and description is not empty %}
+      <div class="puzz-form-fieldset__description">{{ description }}</div>
+    {% endif %}
+
+    {% if errors is not empty %}
+      <div class="puzz-form-fieldset__error"><strong>{{ errors }}</strong></div>
+    {% endif %}
+
+    {% if prefix is not empty %}
+      <span class="puzz-form-fieldset__prefix">{{ prefix }}</span>
+    {% endif %}
+
+    {{ children }}
+
+    {% if suffix is not empty %}
+      <span class="puzz-form-fieldset__suffix">{{ suffix }}</span>
+    {% endif %}
+
+    {% if description_display in ['after', 'invisible'] and description is not empty %}
+      <div class="puzz-form-fieldset__description">{{ description }}</div>
+    {% endif %}
+  </div>
+</fieldset>

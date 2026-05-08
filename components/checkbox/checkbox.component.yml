@@ -1,0 +1,33 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Checkbox
+description: Single checkbox form control.
+group: Forms
+
+libraryOverrides:
+  dependencies:
+    - puzz/checkbox
+
+props:
+  type: object
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+    label:
+      type: string
+    value:
+      type: string
+    checked:
+      type: boolean
+      default: false
+    required:
+      type: boolean
+      default: false
+    disabled:
+      type: boolean
+      default: false
+    help:
+      type: string
+    error:
+      type: string

@@ -9,10 +9,7 @@
  * @see templates/paragraph/paragraph--puzz-c-section--puzz-c-section.html.twig
  */
 
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Url;
-use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\paragraphs\ParagraphInterface;
 
 /**
@@ -95,7 +92,7 @@ function _puzz_paragraph_header_component(array &$variables, ParagraphInterface 
   $caption = $paragraph->hasField('field_puzz_header_caption') && !$paragraph->get('field_puzz_header_caption')->isEmpty()
     ? (string) $paragraph->get('field_puzz_header_caption')->value
     : '';
-  $heading = $caption !== '' ? $caption : _puzz_get_current_page_title();
+  $caption = $caption !== '' ? $caption : _puzz_get_current_page_title();
 
   $image = [];
   if ($paragraph->hasField('field_puzz_header_image') && !$paragraph->get('field_puzz_header_image')->isEmpty()) {
@@ -123,12 +120,9 @@ function _puzz_paragraph_header_component(array &$variables, ParagraphInterface 
   $variables['component'] = 'puzz:header';
   $variables['props'] = [
     'caption' => $caption,
-    'heading' => $heading,
     'image' => $image,
     'link_url' => $link_url,
     'link_title' => $link_title,
-    'label_display' => 'hidden',
-    'label_text' => '',
   ];
 }
 
