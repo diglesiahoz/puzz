@@ -848,14 +848,94 @@ components/
 ### Comandos Disponibles
 
 ```bash
-# Iniciar Storybook (compila automáticamente antes de iniciar)
+# Iniciar Storybook en desarrollo (puerto 6006)
 npm run storybook
 
-# Build de Storybook para producción
+# Build estático para publicar detrás de nginx u otro servidor web
 npm run build-storybook
 ```
 
-**Nota:** El comando `npm run storybook` ejecuta automáticamente `npm run build:dev` antes de iniciar Storybook (mediante el hook `prestorybook` en `package.json`), asegurando que los archivos CSS compilados estén disponibles.
+Antes de abrir Storybook en modo dev, conviene tener CSS del tema generado (por ejemplo `npm run build:dev`). El build estático escribe en la carpeta **`build-storybook/`** del tema. El script `npm run build-storybook` usa **`STORYBOOK_BASE_PATH=/@storybook/`** (vía `cross-env`) para que Vite genere rutas compatibles con servir el sitio bajo **`https://<host>/@storybook/`**; si sirves el estático en la raíz de otro host, puedes sobrescribir la variable en ese comando.
+
+### Publicar el build estático y acceder por el mismo host que Drupal (nginx)
+
+En entornos tipo **Docker + nginx + PHP-FPM**, suele publicarse el HTML de Storybook bajo una ruta del propio sitio (por ejemplo `https://tu-dominio/@storybook/`), con **HTTP Basic** para no exponerlo en abierto.
+
+#### Qué necesitas
+
+1. **Generar el estático** en la máquina donde vive el tema (o en el contenedor con Node):
+
+   ```bash
+   npm run build-storybook
+   ```
+
+2. **Comprobar** que existe el directorio del tema:
+
+   `themes/custom/puzz/build-storybook/`  
+   (con `index.html`, `iframe.html`, `assets/`, etc.).
+
+3. **Nginx**: `alias` al directorio anterior y autenticación. El **docroot** de Drupal en el ejemplo es `/opt/demo/drupal/web`; ajusta rutas si tu proyecto usa otra base.
+
+#### Ejemplo de `location` (plantilla del proyecto)
+
+Referencia: `.dm/templates/webserver.nginx.default.conf` (credenciales por fichero `auth_basic_user_file`, p. ej. `/etc/nginx/conf.d/.htpasswd` generado en la imagen).
+
+```nginx
+# Redirección /@storybook → /@storybook/
+location = /@storybook {
+    auth_basic "Storybook";
+    auth_basic_user_file /etc/nginx/conf.d/.htpasswd;
+    return 301 /@storybook/;
+}
+
+# Estático del build de Storybook
+location /@storybook/ {
+    auth_basic "Storybook";
+    auth_basic_user_file /etc/nginx/conf.d/.htpasswd;
+    alias /opt/demo/drupal/web/themes/custom/puzz/build-storybook/;
+    index index.php index.html index.htm;
+}
+```
+
+- Sustituye **`/opt/demo/drupal/web`** por el docroot real y **`puzz`** por el **nombre de máquina del tema** si usas un tema hijo (entonces el `alias` debe apuntar a `.../themes/custom/TU_TEMA/build-storybook/`).
+- Tras cambiar la plantilla, **reconstruye la imagen** del servicio web o recarga nginx según tu despliegue.
+
+Ejemplo análogo para **`/@stat/`** (ficheros bajo `drupal/web/@stat/` en el docroot):
+
+```nginx
+location = /@stat {
+    auth_basic "Stat";
+    auth_basic_user_file /etc/nginx/conf.d/.htpasswd;
+    return 301 /@stat/;
+}
+
+location /@stat/ {
+    auth_basic "Stat";
+    auth_basic_user_file /etc/nginx/conf.d/.htpasswd;
+    alias /opt/demo/drupal/web/@stat/;
+    index index.php index.html index.htm;
+    try_files $uri $uri/ =404;
+}
+```
+
+#### URLs y acceso
+
+| Recurso | URL típica | Notas |
+|--------|----------------|------|
+| Storybook estático | `https://<host>/@storybook/` | Tras `npm run build-storybook`. |
+| Panel opcional `@stat` | `https://<host>/@stat/` | Contenido en `web/@stat/` del docroot (p. ej. diagnósticos); misma idea de `alias` + Basic en la plantilla nginx. |
+
+En el entorno de demo, HTTP Basic puede usar el mismo fichero **`.htpasswd`** para varias rutas; usuario/contraseña por defecto en plantilla suelen documentarse en el repositorio de infraestructura (cámbialas en producción).
+
+#### Comando Docker (ejemplo)
+
+Desde el host, con el contenedor PHP/web y usuario acordes al proyecto:
+
+```bash
+docker exec -it --user diglesia demo-www npm --prefix ./web/themes/custom/puzz run build-storybook
+```
+
+La ruta de `--prefix` es relativa al **directorio de trabajo** del contenedor (donde exista `web/themes/custom/puzz/package.json`).
 
 ### Configuración de Storybook
 

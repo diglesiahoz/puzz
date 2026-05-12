@@ -27,4 +27,4 @@ src/scss/partials/_*.scss
 
 # Storybook
 *storybook.log
-storybook-static
+build-storybook

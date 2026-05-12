@@ -13,7 +13,7 @@
     "dev": "node scripts/dev-server.js",
     "clean": "rimraf build",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "cross-env STORYBOOK_BASE_PATH=/@storybook/ storybook build -o build-storybook"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.1",
@@ -27,6 +27,7 @@
     "autoprefixer": "^10.4.20",
     "browser-sync": "^3.0.4",
     "chokidar": "^3.6.0",
+    "cross-env": "^7.0.3",
     "fast-glob": "^3.3.3",
     "playwright": "^1.58.2",
     "postcss": "^8.4.47",
