@@ -18,11 +18,11 @@ function storybookPublicPath() {
   return raw.endsWith('/') ? raw : `${raw}/`;
 }
 
-/** Logo del manager: ruta absoluta desde la raiz del dominio (p. ej. `/@storybook/theme/logo.svg`). Se resuelve al generar el HTML del manager (`managerHead`), donde `process.env` si esta disponible en `npm run build-storybook`. */
+/** Logo en URLs publicas (fallback): con `staticDirs` en `/`, el fichero es `/logo.svg` (o bajo base). */
 function brandLogoUrlFromConfig() {
   const base = storybookPublicPath();
-  if (base === '/') return '/theme/logo.svg';
-  return `${base}theme/logo.svg`;
+  if (base === '/') return '/logo.svg';
+  return `${base}logo.svg`;
 }
 
 /** Logo en el manager: data URL leida en tiempo de config (evita GET a `/@storybook/...` con Basic Auth, que el `<img>` suele no autenticar). Fallback: ruta publica. */
@@ -64,8 +64,8 @@ function injectBaseFirstPlugin() {
 }
 
 const config = {
-  // Solo esta carpeta (symlink al logo del tema). No usar la raiz del tema: incluye build-storybook y falla el build (EINVAL).
-  staticDirs: [{ from: join(__dirname, 'assets'), to: '/theme' }],
+  // Mismo directorio: `logo.svg` (tema) + `favicon.svg` -> mismo fichero (preset favicon de Storybook busca favicon.svg en raiz del estatico).
+  staticDirs: [{ from: join(__dirname, 'assets'), to: '/' }],
   stories: ['../components/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: [
     '@chromatic-com/storybook',
