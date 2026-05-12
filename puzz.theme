@@ -40,6 +40,48 @@ function _puzz_theme_root(): string {
 }
 
 /**
+ * Theme machine name from system_theme_settings form config_key (e.g. puzz.settings).
+ */
+function _puzz_theme_settings_edited_theme(string $config_key): string {
+  if ($config_key === '' || $config_key === 'system.theme.global') {
+    return '';
+  }
+  return str_replace('.settings', '', $config_key);
+}
+
+/**
+ * Machine name of the theme being edited on system_theme_settings (per-theme route).
+ *
+ * Prefer the {theme} route parameter so Styles/Colors still resolve if config_key
+ * is missing during alter (e.g. some admin themes or form rebuild edge cases).
+ */
+function _puzz_resolve_edited_theme_from_settings_form(array $form, \Drupal\Core\Form\FormStateInterface $form_state): string {
+  $route_theme = \Drupal::routeMatch()->getParameter('theme');
+  if (is_string($route_theme) && $route_theme !== '') {
+    return $route_theme;
+  }
+  $config_key = (string) ($form['config_key']['#value'] ?? '');
+  $from_key = _puzz_theme_settings_edited_theme($config_key);
+  if ($from_key !== '') {
+    return $from_key;
+  }
+  $args = $form_state->getBuildInfo()['args'] ?? [];
+  $first = $args[0] ?? '';
+  return is_string($first) && $first !== '' ? $first : '';
+}
+
+/**
+ * Whether the theme is Puzz or a sub-theme whose base theme is Puzz.
+ */
+function _puzz_is_puzz_family_theme(string $theme_name): bool {
+  if ($theme_name === 'puzz') {
+    return TRUE;
+  }
+  $info = \Drupal::service('extension.list.theme')->getExtensionInfo($theme_name);
+  return isset($info['base theme']) && $info['base theme'] === 'puzz';
+}
+
+/**
  * Implements hook_theme().
  *
  * Define/override theme hooks para que las plantillas se busquen en el tema.
@@ -262,14 +304,13 @@ function puzz_get_colors(?string $theme_name = NULL): array {
  * Implements hook_form_system_theme_settings_alter().
  */
 function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state): void {
-  // Only add Puzz color settings when editing Puzz theme (not on other themes' pages).
-  $config_key = $form['config_key']['#value'] ?? '';
-  if ($config_key !== 'puzz.settings') {
+  $edited_theme = _puzz_resolve_edited_theme_from_settings_form($form, $form_state);
+  if ($edited_theme === '' || !_puzz_is_puzz_family_theme($edited_theme)) {
     return;
   }
 
   $defaults = puzz_get_color_defaults();
-  $colors = puzz_get_colors('puzz');
+  $colors = puzz_get_colors($edited_theme);
 
   // Colors section
   $form['styles'] = [
@@ -354,7 +395,7 @@ function puzz_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
   }
 
   // Icons section.
-  $config = \Drupal::configFactory()->get('puzz.settings');
+  $config = \Drupal::configFactory()->get($edited_theme . '.settings');
   $icons_enabled = (bool) ($config->get('icons_enabled') ?? TRUE);
   $icons_include_all = (bool) ($config->get('icons_include_all') ?? TRUE);
   $icons_selected = $config->get('icons_selected');
@@ -552,7 +593,7 @@ function puzz_theme_settings_submit(&$form, \Drupal\Core\Form\FormStateInterface
  * Rebuilds icon sprite files after saving theme settings.
  */
 function _puzz_regenerate_icon_sprite(string $theme_name): void {
-  if ($theme_name !== 'puzz') {
+  if (!_puzz_is_puzz_family_theme($theme_name)) {
     return;
   }
 
@@ -792,7 +833,13 @@ function puzz_preprocess_breadcrumb(array &$variables): void {
  * Returns whether icons are globally enabled in theme settings.
  */
 function _puzz_icons_enabled(): bool {
-  return (bool) (\Drupal::config('puzz.settings')->get('icons_enabled') ?? TRUE);
+  try {
+    $active = \Drupal::theme()->getActiveTheme()->getName();
+  }
+  catch (\Throwable $e) {
+    return TRUE;
+  }
+  return (bool) (\Drupal::config($active . '.settings')->get('icons_enabled') ?? TRUE);
 }
 
 /**

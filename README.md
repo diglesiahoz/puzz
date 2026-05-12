@@ -64,6 +64,61 @@ npm run build:dev   # Desarrollo
 npm run dev         # Servidor de desarrollo con hot reload
 ```
 
+## 👶 Generador de tema hijo (Drush, `puzz_cli`)
+
+Drupal **no** registra comandos Drush dentro del fichero `.theme`. El clonador del tema está en el módulo **`puzz_cli`**:
+
+- **Comando:** `drush puzz:child-theme:create`  
+- **Alias:** `puzz:ctc`
+
+### Qué hace el comando
+
+1. **Copia** el árbol completo del tema `puzz` (componentes SDC, plantillas, `puzz.theme`, includes, `package.json`, `config/install`, `config/optional`, etc.).
+2. **Excluye** carpetas pesadas o regenerables (`node_modules`, `build`, `.git`, y otras definidas en `PuzzThemeForkBuilder`).
+3. **Renombra** identificadores del tema (`puzz` → nombre máquina nuevo): ficheros `puzz.*`, librerías `puzz/`, namespaces SDC `puzz:*`, funciones PHP, referencias en YAML/Twig/SCSS donde aplique.
+4. **Preserva** intencionadamente lo que debe seguir coincidiendo con el sitio Drupal: bundles y campos (`puzz_section`, `field_puzz_*`, tipos de párrafo), clases de `body` como `page-node-type-puzz-*` (p. ej. tipo de contenido `puzz_landing`), tokens usados por otros módulos (`puzz_icon_*`), etc. Así el layout SCSS (p. ej. landing a ancho completo en `_layout.scss`) sigue acoplado al HTML real.
+5. Deja el `.info.yml` como tema **independiente** (`base theme: false`).
+
+La implementación está en `drupal/web/modules/custom/puzz_core/modules/puzz_cli/` (`PuzzThemeForkBuilder`, comando Drush). La documentación **detallada** de opciones, orden de ejecución, `--build`, `--set-default` e incidencias frecuentes está en **`drupal/web/modules/custom/puzz_core/modules/puzz_cli/README.md`**.
+
+### Opciones principales (resumen)
+
+| Opción | Efecto |
+|--------|--------|
+| *(ninguna extra)* | Solo crea los ficheros del tema nuevo. Después debes compilar (`npm install` / `npm run build` en la carpeta del tema, o repetir el comando con `--build`). |
+| `--build` | Tras clonar, instala dependencias del tema y ejecuta la compilación de front-end en esa carpeta (requiere Node.js en el entorno donde corre Drush). |
+| `--set-default` | Tras clonar (y tras `--build` si lo usaste): vacía cachés, **instala** el tema y permite **dejarlo como tema por defecto** (con confirmación salvo `-y`). **No** existe una opción separada “solo habilitar”; para eso usa solo ficheros y luego `drush theme:enable` manualmente. |
+| `-y` / `--yes` | Evita la confirmación al fijar el tema por defecto cuando usas `--set-default`. |
+
+### Ejemplos de línea de comandos
+
+Solo creación de ficheros:
+
+```bash
+drush puzz:child-theme:create mi_sitio --name="Mi sitio" --path=themes/custom
+```
+
+Creación + compilación + habilitar y dejar por defecto (sin preguntas):
+
+```bash
+drush puzz:child-theme:create mi_sitio --name="Mi sitio" --build --set-default -y
+```
+
+Sustituye la ruta de `drush`, el nombre del tema y `--uri` según tu instalación (local, Docker, CI).
+
+### Ajustes del tema (colores, iconos) en un fork
+
+Las pestañas **Styles → Colors / Icons** del formulario de ajustes las añade el propio tema (`hook_form_system_theme_settings_alter` en `puzz.theme` en el padre; en el fork, el equivalente `MACHINE.theme`).
+
+- Debes abrir los ajustes **del tema concreto**, no los globales de apariencia:  
+  **`/admin/appearance/settings/NOMBRE_MAQUINA`**  
+  (por ejemplo `/admin/appearance/settings/puzz` para Puzz, o el nombre de tu fork).
+- La página **`/admin/appearance/settings`** sin `{theme}` es la configuración global del sitio; ahí **no** se muestran esas pestañas extendidas.
+
+### Después del clon
+
+En la carpeta del tema nuevo sigue siendo necesario tener **`build/`** generado para CSS/JS en pantalla: usa **`--build`** en el comando o ejecuta en el tema los scripts definidos en `package.json` (p. ej. `npm install` y `npm run build`).
+
 ## 📝 Comandos Disponibles
 
 - `npm run build` - Compila en modo producción (CSS minificado, sin source maps)
