@@ -1,13 +1,17 @@
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming';
 
-// Rutas relativas al documento del manager: el build del manager NO recibe STORYBOOK_BASE_PATH
-// (process.env queda vacio y antes generaba `/theme/logo.svg` en la raiz del dominio -> 404).
-// Con `staticDirs` en `/`, el logo queda en `./logo.svg` (y favicon en `./favicon.svg`, mismo SVG).
+// `name` del tema: lo inyecta `main.js` (managerHead) leyendo el `*.info.yml` de la raiz del tema (puzz o hijo).
+function brandTitleFromTheme() {
+  const n = globalThis.__PUZZ_STORYBOOK_THEME_NAME__;
+  return typeof n === 'string' && n.trim() ? n.trim() : 'Theme';
+}
+
+// Con `staticDirs` en `/`, logo y favicon en `./logo.svg` / `./favicon.svg`.
 addons.setConfig({
   theme: create({
     base: 'dark',
-    brandTitle: 'Puzz',
+    brandTitle: brandTitleFromTheme(),
     brandUrl: './',
     brandImage: './logo.svg',
     brandTarget: '_self',

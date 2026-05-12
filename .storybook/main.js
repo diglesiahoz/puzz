@@ -1,11 +1,42 @@
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 import { mergeConfig } from 'vite';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+/** Raiz del tema (puzz o un hijo en `themes/custom/<machine_name>/`). */
+const themeRoot = join(__dirname, '..');
+
+/**
+ * `name` del `*.info.yml` del tema actual (hijo o padre). No hardcodear "puzz".
+ */
+function readThemeDisplayName() {
+  const slug = basename(themeRoot);
+  try {
+    const files = readdirSync(themeRoot);
+    const preferred = `${slug}.info.yml`;
+    const ymlName = files.includes(preferred)
+      ? preferred
+      : files.find((f) => f.endsWith('.info.yml'));
+    if (!ymlName) return slug;
+    const raw = readFileSync(join(themeRoot, ymlName), 'utf8');
+    for (const line of raw.split(/\r?\n/)) {
+      const t = line.trim();
+      if (!t.startsWith('name:')) continue;
+      let v = t.slice(5).trim();
+      if ((v.startsWith("'") && v.endsWith("'")) || (v.startsWith('"') && v.endsWith('"'))) {
+        return v.slice(1, -1).trim();
+      }
+      return v.replace(/\s+#.*$/, '').trim();
+    }
+  } catch {
+    /* vacio */
+  }
+  return slug;
+}
 
 /**
  * Ruta publicada del estatico (p. ej. nginx `/@storybook/`).
@@ -77,8 +108,23 @@ const config = {
   /** CSS del manager + logo incrustado (data URL) para no depender de Basic Auth en subrecursos. */
   managerHead: (head) => {
     const logoSrc = brandLogoSrcForManager();
+    const themeDisplayName = readThemeDisplayName();
     return `${head ?? ''}
+<script>globalThis.__PUZZ_STORYBOOK_THEME_NAME__=${JSON.stringify(themeDisplayName)};</script>
 <style id="puzz-storybook-manager">
+  .sidebar-header a[title][href] {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+  .sidebar-header a[title][href]::after {
+    content: attr(title);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: #a0a0a0;
+  }
   .sidebar-header img {
     max-height: 50px;
     width: auto;
