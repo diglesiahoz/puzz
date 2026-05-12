@@ -6,6 +6,7 @@
   "author": "Daniel de la Iglesia",
   "license": "ISC",
   "scripts": {
+    "postinstall": "patch-package",
     "build": "npm run build:prod",
     "build:dev": "node scripts/build.js dev",
     "build:prod": "node scripts/build.js prod",
@@ -29,6 +30,7 @@
     "chokidar": "^3.6.0",
     "cross-env": "^7.0.3",
     "fast-glob": "^3.3.3",
+    "patch-package": "^8.0.1",
     "playwright": "^1.58.2",
     "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",

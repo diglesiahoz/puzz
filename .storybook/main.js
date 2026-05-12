@@ -1,5 +1,6 @@
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 import { mergeConfig } from 'vite';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -15,6 +16,24 @@ function storybookPublicPath() {
   const raw = process.env.STORYBOOK_BASE_PATH;
   if (!raw || raw === '/') return '/';
   return raw.endsWith('/') ? raw : `${raw}/`;
+}
+
+/** Logo del manager: ruta absoluta desde la raiz del dominio (p. ej. `/@storybook/theme/logo.svg`). Se resuelve al generar el HTML del manager (`managerHead`), donde `process.env` si esta disponible en `npm run build-storybook`. */
+function brandLogoUrlFromConfig() {
+  const base = storybookPublicPath();
+  if (base === '/') return '/theme/logo.svg';
+  return `${base}theme/logo.svg`;
+}
+
+/** Logo en el manager: data URL leida en tiempo de config (evita GET a `/@storybook/...` con Basic Auth, que el `<img>` suele no autenticar). Fallback: ruta publica. */
+function brandLogoSrcForManager() {
+  try {
+    const logoPath = join(__dirname, 'assets', 'logo.svg');
+    const svg = readFileSync(logoPath, 'utf8');
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  } catch {
+    return brandLogoUrlFromConfig();
+  }
 }
 
 /** Sin esto, `<base href>` queda despues de los modulepreload y las rutas `./...` fallan en subruta. */
@@ -45,6 +64,8 @@ function injectBaseFirstPlugin() {
 }
 
 const config = {
+  // Solo esta carpeta (symlink al logo del tema). No usar la raiz del tema: incluye build-storybook y falla el build (EINVAL).
+  staticDirs: [{ from: join(__dirname, 'assets'), to: '/theme' }],
   stories: ['../components/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: [
     '@chromatic-com/storybook',
@@ -53,6 +74,45 @@ const config = {
     '@storybook/addon-docs',
   ],
   framework: '@storybook/html-vite',
+  /** CSS del manager + logo incrustado (data URL) para no depender de Basic Auth en subrecursos. */
+  managerHead: (head) => {
+    const logoSrc = brandLogoSrcForManager();
+    return `${head ?? ''}
+<style id="puzz-storybook-manager">
+  .sidebar-header img {
+    max-height: 50px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+</style>
+<script id="puzz-storybook-brand-src">
+(function () {
+  var SRC = ${JSON.stringify(logoSrc)};
+  function puzzApplyBrandSrc() {
+    document.querySelectorAll(".sidebar-header img").forEach(function (el) {
+      if (el.getAttribute("src") !== SRC) {
+        el.setAttribute("src", SRC);
+      }
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", puzzApplyBrandSrc);
+  } else {
+    puzzApplyBrandSrc();
+  }
+  var obs = new MutationObserver(function () {
+    clearTimeout(obs.t);
+    obs.t = setTimeout(puzzApplyBrandSrc, 0);
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+  [0, 100, 400, 1200].forEach(function (ms) {
+    setTimeout(puzzApplyBrandSrc, ms);
+  });
+})();
+<\/script>
+`;
+  },
   async viteFinal(config) {
     const drupalUrl =
       process.env.APPSETTING_SERVICE_WWW_HOST || 'http://localhost';
@@ -60,8 +120,8 @@ const config = {
       console.log('Drupal URL (Storybook proxy):', drupalUrl);
     }
 
-    return mergeConfig(config, {
-      plugins: [injectBaseFirstPlugin(), ...(config.plugins ?? [])],
+    // Primero merge normal (no tocar `plugins` aqui: mergeConfig los concatena y duplicaria).
+    const merged = mergeConfig(config, {
       base: storybookPublicPath(),
       root: join(__dirname, '..'),
       resolve: {
@@ -82,6 +142,18 @@ const config = {
         },
       },
     });
+
+    const existing = merged.plugins;
+    const list = Array.isArray(existing)
+      ? existing.flat(Infinity).filter(Boolean)
+      : existing
+        ? [existing]
+        : [];
+
+    return {
+      ...merged,
+      plugins: [injectBaseFirstPlugin(), ...list],
+    };
   },
 };
 export default config;
